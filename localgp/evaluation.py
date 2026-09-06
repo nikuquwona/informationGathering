@@ -59,6 +59,13 @@ def episode(trainer, seed, policy='trained', trace=False):
                 mean_throughput_bps=float(np.mean([r['throughput_bps'] for r in rows])),
                 mean_prediction_rmse=float(np.mean([r['prediction_rmse'] for r in rows])),
                 final_coverage=rows[-1]['coverage'],distance_m=rows[-1]['distance_m'],collisions=rows[-1]['collisions'])
+    # Energy-limited policies can finish before the observation window ends.
+    # Keep active-episode averages, but also compare total delivered service over
+    # the same fixed horizon, crediting no service after this task has ended.
+    result['duration_seconds']=env.steps*env.config.dt
+    result['delivered_megabits']=result['mean_throughput_bps']*env.steps*env.config.dt/1e6
+    result['horizon_coverage']=result['mean_coverage']*env.steps/env.config.horizon
+    result['horizon_throughput_bps']=result['mean_throughput_bps']*env.steps/env.config.horizon
     if trace:
         result['frames']=frames
     return result
@@ -66,7 +73,7 @@ def episode(trainer, seed, policy='trained', trace=False):
 
 def summarize(episodes):
     result={}
-    for metric in ('team_return','mean_coverage','mean_throughput_bps','mean_prediction_rmse','final_coverage','distance_m','collisions'):
+    for metric in ('team_return','mean_coverage','mean_throughput_bps','mean_prediction_rmse','final_coverage','distance_m','collisions','duration_seconds','delivered_megabits','horizon_coverage','horizon_throughput_bps'):
         values=np.array([row[metric] for row in episodes],float)
         result[metric]=dict(mean=float(values.mean()),std=float(values.std(ddof=1)) if len(values)>1 else 0.,n=len(values))
     return result
@@ -84,6 +91,7 @@ def compare(trainer, count, seed):
     differences={}
     for policy in ('random','greedy','stationary'):
         differences[policy]={metric:[a[metric]-b[metric] for a,b in zip(trained,results[policy]['episodes'])]
-                             for metric in ('mean_coverage','mean_throughput_bps')}
+                             for metric in ('mean_coverage','mean_throughput_bps','horizon_coverage','horizon_throughput_bps')}
     return dict(results=results,paired_differences=differences,
-                interpretation='Same scene seeds, one trained checkpoint. This is not a multi-training-seed significance study.')
+                checkpoint_selection_metric='validation active-episode mean_throughput_bps',
+                interpretation='Same scene seeds, one trained checkpoint. Fixed-horizon metrics credit zero service after task termination. This is not a multi-training-seed significance study.')

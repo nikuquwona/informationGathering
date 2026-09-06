@@ -131,3 +131,14 @@ def test_portable_checkpoint_without_best_selects_current_segment(tmp_path):
     restored.run(tmp_path/'resumed',tmp_path/'portable'/'last.pt')
     assert (tmp_path/'resumed'/'best.pt').exists()
     assert restored.best_eval<1e12
+
+
+def test_early_termination_service_is_compared_on_fixed_horizon():
+    from localgp.evaluation import episode
+    ec,tc=configs()
+    trainer=Trainer(replace(ec,distance_budget=.1),tc)
+    result=episode(trainer,1000,policy='random')
+    assert result['steps']<ec.horizon
+    assert result['horizon_throughput_bps']==pytest.approx(result['mean_throughput_bps']*result['steps']/ec.horizon)
+    assert result['delivered_megabits']==pytest.approx(result['mean_throughput_bps']*result['duration_seconds']/1e6)
+    assert result['horizon_coverage']<=result['mean_coverage']
