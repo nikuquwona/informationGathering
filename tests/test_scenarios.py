@@ -57,12 +57,13 @@ def test_heldout_elongated_maps_are_valid():
         assert inside(env.positions,env.bounds).all()
 
 
-def test_generalized_training_update_and_restore(tmp_path):
+@pytest.mark.parametrize("local_view",[False,True])
+def test_generalized_training_update_and_restore(tmp_path,local_view):
     pytest.importorskip('torch')
     from localgp.trainer import Trainer
     from threadpoolctl import threadpool_limits
     with threadpool_limits(limits=1):
-        trainer=Trainer(config(users=12,grid_size=12),TrainConfig(device='cpu',rollout_steps=8,total_steps=16))
+        trainer=Trainer(config(users=12,grid_size=12,local_view=local_view),TrainConfig(device='cpu',rollout_steps=8,total_steps=16))
         batch,_=trainer.collect();trainer.update(batch);trainer.checkpoint(tmp_path/'model.pt')
         restored=Trainer(trainer.ec,trainer.tc);restored.restore(tmp_path/'model.pt')
         a,_=trainer.collect();b,_=restored.collect()
@@ -77,3 +78,16 @@ def test_fixed_window_has_no_flight_budget_and_zero_terminal_bootstrap():
         assert not truncated
     assert env.distance.sum()>.01
     np.testing.assert_array_equal(env.observe()['context'][:,2],1.)
+
+
+def test_local_view_only_reexpresses_observed_belief_at_own_position():
+    env=DeploymentEnv(config(local_view=True),5)
+    env.positions=np.array([[30.,30.],[50.,50.],[70.,70.]])
+    mu=env.query[:,0]/100
+    env.belief.predict=lambda:(mu.copy(),np.ones(len(mu)))
+    obs=env.observe()
+    assert obs['maps'].shape==(3,4,24,24)
+    np.testing.assert_allclose(obs['maps'][:,2,11:13,11:13].mean(axis=(1,2)),env.positions[:,0]/100,atol=1e-6)
+    env.users[:]=99
+    for key in obs:np.testing.assert_array_equal(obs[key],env.observe()[key])
+    assert env.central_state()['maps'].shape==(3,3,24,24)

@@ -2,6 +2,7 @@
 from dataclasses import asdict
 import copy
 import numpy as np
+from scipy.ndimage import map_coordinates
 from .config import EnvConfig
 from .gp import LocalBelief
 from .radio import channel_gain, service_metrics
@@ -88,13 +89,24 @@ class DeploymentEnv:
         context=np.asarray(context,np.float32)
         if c.scenario=="generalized":
             context=np.concatenate((context,np.repeat((self.bounds.reshape(-1)/c.area_size)[None],c.agents,axis=0)),axis=1).astype(np.float32)
-        return dict(maps=np.repeat(shared[None], c.agents, axis=0), context=context)
+        maps=np.repeat(shared[None],c.agents,axis=0)
+        if c.local_view:
+            # Re-express already available GP beliefs relative to each UAV.
+            # This is not a controller and never reads hidden users or targets.
+            offset=np.linspace(-2*c.gp_length_scale,2*c.gp_length_scale,c.grid_size)
+            dx,dy=np.meshgrid(offset,offset,indexing='ij')
+            local=[]
+            for position in self.positions:
+                coords=np.stack((position[0]+dx,position[1]+dy))*c.grid_size/c.area_size-.5
+                local.append(np.stack([map_coordinates(shared[k],coords,order=1,mode='constant',cval=float(k),prefilter=False) for k in range(2)]))
+            maps=np.concatenate((maps,np.asarray(local,dtype=np.float32)),axis=1)
+        return dict(maps=maps, context=context)
 
     def central_state(self):
         c = self.config
         actor = self.observe()
         truth = self.encode_signal(c.mu_power * channel_gain(self.query, self.users, c).sum(axis=1)).reshape(c.grid_size, c.grid_size)
-        maps = np.concatenate((actor['maps'][0], truth[None]), axis=0).astype(np.float32)
+        maps = np.concatenate((actor['maps'][0,:2], truth[None]), axis=0).astype(np.float32)
         global_context = np.r_[self.positions.reshape(-1)/c.area_size, (1-self.distance/c.distance_budget if c.enforce_distance_budget else np.ones(c.agents)), self.steps/c.horizon]
         if c.scenario=="generalized":global_context=np.r_[global_context,self.bounds.reshape(-1)/c.area_size]
         contexts = [np.r_[global_context, np.eye(c.agents)[i]] for i in range(c.agents)]

@@ -87,14 +87,17 @@ def test_restore_rejects_changed_scenario_and_allows_extended_budget(tmp_path):
 
 
 @pytest.mark.skipif(not torch.backends.mps.is_available(),reason='MPS unavailable on this host')
-def test_mps_real_forward_backward_and_checkpoint(tmp_path):
-    trainer=Trainer(*configs('mps'))
+@pytest.mark.parametrize("local_view",[False,True])
+def test_mps_real_forward_backward_and_checkpoint(tmp_path,local_view):
+    ec,tc=configs('mps')
+    if local_view:ec=replace(ec,scenario="generalized",local_view=True)
+    trainer=Trainer(ec,tc)
     assert next(trainer.actor.parameters()).device.type=='mps'
     batch,_=trainer.collect()
     metrics=trainer.update(batch)
     assert np.isfinite(metrics['policy_loss'])
     trainer.checkpoint(tmp_path/'mps.pt')
-    restored=Trainer(*configs('mps'))
+    restored=Trainer(ec,tc)
     restored.restore(tmp_path/'mps.pt')
     for a,b in zip(trainer.actor.parameters(),restored.actor.parameters()):
         torch.testing.assert_close(a,b)
