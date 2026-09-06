@@ -1,0 +1,1406 @@
+{
+  "protocol": {
+    "training_seeds": [
+      7,
+      17,
+      27
+    ],
+    "steps_per_training_seed": 16384,
+    "total_training_steps": 49152,
+    "validation_seeds": [
+      100000,
+      100001,
+      100002,
+      100003
+    ],
+    "test_seeds": [
+      200000,
+      200001,
+      200002,
+      200003,
+      200004,
+      200005,
+      200006,
+      200007
+    ],
+    "checkpoint_selection": "Maximum validation active-episode mean throughput; selection unchanged after testing",
+    "final_reporting": "Fixed 64-second horizon; no service credited after this task terminates",
+    "environment": {
+      "agents": 3,
+      "users": 50,
+      "clusters": 3,
+      "area_size": 100.0,
+      "grid_size": 24,
+      "horizon": 64,
+      "dt": 1.0,
+      "max_speed": 2.0,
+      "distance_budget": 100.0,
+      "min_separation": 2.0,
+      "user_speed_std": 0.3,
+      "altitude": 10.0,
+      "mu_power": 0.2,
+      "aebs_power": 1.0,
+      "bandwidth": 1000000.0,
+      "noise_power": 1e-10,
+      "association_threshold": 1e-08,
+      "los_c": 9.61,
+      "los_d": 0.16,
+      "reference_loss_db": 30.0,
+      "path_loss_exponent": 2.0,
+      "nlos_extra_db": 20.0,
+      "measurement_noise": 1e-08,
+      "signal_scale": 1e-06,
+      "gp_length_scale": 15.0,
+      "gp_noise": 0.03,
+      "gp_axis": 3,
+      "gp_max_samples": 48,
+      "gp_max_age": 64,
+      "reward": "balanced",
+      "signal_weight": 1.0,
+      "information_weight": 0.5,
+      "movement_weight": 0.03,
+      "collision_weight": 1.0
+    },
+    "limitations": [
+      "Exploratory channel model, not a calibrated paper reproduction",
+      "Three training seeds and eight test scenarios are a pilot, not a significance claim",
+      "Collision counters denote rejected moves, not physical collisions",
+      "GP uncertainty is a fused proxy, not calibrated joint entropy"
+    ]
+  },
+  "trials": [
+    {
+      "training_seed": 7,
+      "training_steps": 16384,
+      "selected_checkpoint_step": 8192,
+      "checkpoint_sha256": "60c66c157fd4b02898a73ac9935d36d7355a8ae8f1c4cb79a1b40ac725e91b27",
+      "training_source_commits": [
+        "a790b130edefdfc78af5eec19e5fbc687c9ce744",
+        "a790b130edefdfc78af5eec19e5fbc687c9ce744"
+      ],
+      "source_files_sha256": {
+        "localgp/__init__.py": "262c4416819c1e50c2e55adaf635dde151c5492495234c22dd14954a14817347",
+        "localgp/config.py": "b40b81d83ba8eeb8f3c29f2c2d1237f5a2e417ba299e0d73a1a5c0443ef4acc1",
+        "localgp/environment.py": "9cf751ec21dbc6da53036f429babeacf9c37c4618811eec05038bb76f50abbc6",
+        "localgp/evaluate.py": "56488200fc364d92e46fd0076e50e769b19a523cbe54108fec84c46825c69e4f",
+        "localgp/evaluation.py": "30fb22d9bce33c6309158ef153ccc34bad0f3d41db3ad479b026bda0a4cafde8",
+        "localgp/gp.py": "74170db5d4d63d48ed1d6712eb5f9301daa98bb177c2e9f90bc9fba9830ff3bc",
+        "localgp/model.py": "90eb01a94697abec5eb5fee94f416a0853a9a96da37ced9bf421bbd6bd1c4318",
+        "localgp/radio.py": "3377ee9e349761fcba2862208dc17a9f6ae261a5fffaa013e3e50510827fb183",
+        "localgp/rollout.py": "0ec51dabc3654616d6f516a7f2c900156fe6b24df1c44961a8d1424f33593861",
+        "localgp/train.py": "e4499fdd4f4e0e21990ae5edf3c4597074472320e57fef4cb09eba2a104b760b",
+        "localgp/trainer.py": "9990c64ad617c4bdfac9f181960bcbd2017a22d54b74a09aa51671309b0bdd61"
+      },
+      "evaluation_source": {
+        "commit": "60e6c297a02dd17c904a6fb1f8c9ad9cfdf2f065",
+        "dirty": false,
+        "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_files_sha256": {
+          "localgp/__init__.py": "262c4416819c1e50c2e55adaf635dde151c5492495234c22dd14954a14817347",
+          "localgp/config.py": "b40b81d83ba8eeb8f3c29f2c2d1237f5a2e417ba299e0d73a1a5c0443ef4acc1",
+          "localgp/environment.py": "9cf751ec21dbc6da53036f429babeacf9c37c4618811eec05038bb76f50abbc6",
+          "localgp/evaluate.py": "81aa9d43e336f3bbad3801b46bdd9bcec20e35cf788d508890a7ddbbd81ec475",
+          "localgp/evaluation.py": "b8c6159e826aa8e09fe7d0ca41fa57c0f2ca57781d0dfe6991d638b522f76af2",
+          "localgp/gp.py": "74170db5d4d63d48ed1d6712eb5f9301daa98bb177c2e9f90bc9fba9830ff3bc",
+          "localgp/model.py": "90eb01a94697abec5eb5fee94f416a0853a9a96da37ced9bf421bbd6bd1c4318",
+          "localgp/radio.py": "3377ee9e349761fcba2862208dc17a9f6ae261a5fffaa013e3e50510827fb183",
+          "localgp/rollout.py": "0ec51dabc3654616d6f516a7f2c900156fe6b24df1c44961a8d1424f33593861",
+          "localgp/train.py": "e4499fdd4f4e0e21990ae5edf3c4597074472320e57fef4cb09eba2a104b760b",
+          "localgp/trainer.py": "8d42b8e9db775a81b7fbdfa617ab8e339b26f2aa2dd88ff8d3ee1acf000f698c"
+        },
+        "python": "3.12.14",
+        "torch": "2.14.0",
+        "numpy": "2.5.2",
+        "scipy": "1.18.1",
+        "platform": "macOS-26.5.2-arm64-arm-64bit"
+      },
+      "evaluation_device": "mps",
+      "recorded_training_seconds": 117.96353558287956,
+      "report": "output/final-evaluation-seed7/report.html",
+      "comparison_sha256": "9ab8b4eb0240cbc1b6e195186e492b0c571932cd3d3ae7145898fcba70c931e3",
+      "summary": {
+        "team_return": {
+          "mean": 23.768283095875482,
+          "std": 28.871859896729777,
+          "n": 8
+        },
+        "mean_coverage": {
+          "mean": 0.30078125,
+          "std": 0.24363384366049334,
+          "n": 8
+        },
+        "mean_throughput_bps": {
+          "mean": 4636711.597250467,
+          "std": 3020926.195707356,
+          "n": 8
+        },
+        "mean_prediction_rmse": {
+          "mean": 1.2672385343651396,
+          "std": 0.1398429972022751,
+          "n": 8
+        },
+        "final_coverage": {
+          "mean": 0.37,
+          "std": 0.27464262493023806,
+          "n": 8
+        },
+        "distance_m": {
+          "mean": 81.3672611862421,
+          "std": 1.8246846860321775,
+          "n": 8
+        },
+        "collisions": {
+          "mean": 22.625,
+          "std": 0.5175491695067657,
+          "n": 8
+        },
+        "duration_seconds": {
+          "mean": 64.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "delivered_megabits": {
+          "mean": 296.7495422240299,
+          "std": 193.33927652527078,
+          "n": 8
+        },
+        "horizon_coverage": {
+          "mean": 0.30078125,
+          "std": 0.24363384366049334,
+          "n": 8
+        },
+        "horizon_throughput_bps": {
+          "mean": 4636711.597250467,
+          "std": 3020926.195707356,
+          "n": 8
+        }
+      },
+      "episodes": [
+        {
+          "seed": 200000,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": -4.36143456682684,
+          "mean_coverage": 0.005,
+          "mean_throughput_bps": 615390.5280080987,
+          "mean_prediction_rmse": 1.4022312992094494,
+          "final_coverage": 0.02,
+          "distance_m": 80.26162797212599,
+          "collisions": 22,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 39.384993792518316,
+          "horizon_coverage": 0.005,
+          "horizon_throughput_bps": 615390.5280080987
+        },
+        {
+          "seed": 200001,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 69.93264920193202,
+          "mean_coverage": 0.6734375,
+          "mean_throughput_bps": 8956615.51029846,
+          "mean_prediction_rmse": 1.0235573665282742,
+          "final_coverage": 0.88,
+          "distance_m": 84.22551244497299,
+          "collisions": 23,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 573.2233926591015,
+          "horizon_coverage": 0.6734375,
+          "horizon_throughput_bps": 8956615.51029846
+        },
+        {
+          "seed": 200002,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 30.169214640516454,
+          "mean_coverage": 0.36749999999999994,
+          "mean_throughput_bps": 6804779.196967019,
+          "mean_prediction_rmse": 1.2652690040386563,
+          "final_coverage": 0.32,
+          "distance_m": 80.99986281991002,
+          "collisions": 23,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 435.5058686058892,
+          "horizon_coverage": 0.36749999999999994,
+          "horizon_throughput_bps": 6804779.196967019
+        },
+        {
+          "seed": 200003,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": -3.068284813430833,
+          "mean_coverage": 0.052812500000000005,
+          "mean_throughput_bps": 1811874.2547831242,
+          "mean_prediction_rmse": 1.3838586286453485,
+          "final_coverage": 0.14,
+          "distance_m": 80.14306807518005,
+          "collisions": 22,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 115.95995230611994,
+          "horizon_coverage": 0.052812500000000005,
+          "horizon_throughput_bps": 1811874.2547831242
+        },
+        {
+          "seed": 200004,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 49.779645700614275,
+          "mean_coverage": 0.5296875,
+          "mean_throughput_bps": 6238520.949612863,
+          "mean_prediction_rmse": 1.109580295219271,
+          "final_coverage": 0.56,
+          "distance_m": 83.95026725530627,
+          "collisions": 23,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 399.26534077522325,
+          "horizon_coverage": 0.5296875,
+          "horizon_throughput_bps": 6238520.949612863
+        },
+        {
+          "seed": 200005,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 4.665185025172982,
+          "mean_coverage": 0.25375,
+          "mean_throughput_bps": 3319922.6512203147,
+          "mean_prediction_rmse": 1.3302256999207545,
+          "final_coverage": 0.32,
+          "distance_m": 79.45768162608147,
+          "collisions": 23,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 212.47504967810013,
+          "horizon_coverage": 0.25375,
+          "horizon_throughput_bps": 3319922.6512203147
+        },
+        {
+          "seed": 200006,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 44.96469734853187,
+          "mean_coverage": 0.443125,
+          "mean_throughput_bps": 7129587.423199502,
+          "mean_prediction_rmse": 1.2311982628609255,
+          "final_coverage": 0.52,
+          "distance_m": 81.84839248657227,
+          "collisions": 23,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 456.2935950847681,
+          "horizon_coverage": 0.443125,
+          "horizon_throughput_bps": 7129587.423199502
+        },
+        {
+          "seed": 200007,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": -1.9354077695060585,
+          "mean_coverage": 0.0809375,
+          "mean_throughput_bps": 2217002.263914353,
+          "mean_prediction_rmse": 1.3919877184984375,
+          "final_coverage": 0.2,
+          "distance_m": 80.05167680978778,
+          "collisions": 22,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 141.88814489051862,
+          "horizon_coverage": 0.0809375,
+          "horizon_throughput_bps": 2217002.263914353
+        }
+      ]
+    },
+    {
+      "training_seed": 17,
+      "training_steps": 16384,
+      "selected_checkpoint_step": 16384,
+      "checkpoint_sha256": "004b148bd21fbc9ddc371221cd32d7fd43c1a487dd5b33a6065f49fb0d2d217f",
+      "training_source_commits": [
+        "2758028144396005d150bf83cf713efe28a97cb1"
+      ],
+      "source_files_sha256": {
+        "localgp/__init__.py": "262c4416819c1e50c2e55adaf635dde151c5492495234c22dd14954a14817347",
+        "localgp/config.py": "b40b81d83ba8eeb8f3c29f2c2d1237f5a2e417ba299e0d73a1a5c0443ef4acc1",
+        "localgp/environment.py": "9cf751ec21dbc6da53036f429babeacf9c37c4618811eec05038bb76f50abbc6",
+        "localgp/evaluate.py": "56488200fc364d92e46fd0076e50e769b19a523cbe54108fec84c46825c69e4f",
+        "localgp/evaluation.py": "30fb22d9bce33c6309158ef153ccc34bad0f3d41db3ad479b026bda0a4cafde8",
+        "localgp/gp.py": "74170db5d4d63d48ed1d6712eb5f9301daa98bb177c2e9f90bc9fba9830ff3bc",
+        "localgp/model.py": "90eb01a94697abec5eb5fee94f416a0853a9a96da37ced9bf421bbd6bd1c4318",
+        "localgp/radio.py": "3377ee9e349761fcba2862208dc17a9f6ae261a5fffaa013e3e50510827fb183",
+        "localgp/rollout.py": "0ec51dabc3654616d6f516a7f2c900156fe6b24df1c44961a8d1424f33593861",
+        "localgp/train.py": "e4499fdd4f4e0e21990ae5edf3c4597074472320e57fef4cb09eba2a104b760b",
+        "localgp/trainer.py": "8d42b8e9db775a81b7fbdfa617ab8e339b26f2aa2dd88ff8d3ee1acf000f698c"
+      },
+      "evaluation_source": {
+        "commit": "60e6c297a02dd17c904a6fb1f8c9ad9cfdf2f065",
+        "dirty": false,
+        "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_files_sha256": {
+          "localgp/__init__.py": "262c4416819c1e50c2e55adaf635dde151c5492495234c22dd14954a14817347",
+          "localgp/config.py": "b40b81d83ba8eeb8f3c29f2c2d1237f5a2e417ba299e0d73a1a5c0443ef4acc1",
+          "localgp/environment.py": "9cf751ec21dbc6da53036f429babeacf9c37c4618811eec05038bb76f50abbc6",
+          "localgp/evaluate.py": "81aa9d43e336f3bbad3801b46bdd9bcec20e35cf788d508890a7ddbbd81ec475",
+          "localgp/evaluation.py": "b8c6159e826aa8e09fe7d0ca41fa57c0f2ca57781d0dfe6991d638b522f76af2",
+          "localgp/gp.py": "74170db5d4d63d48ed1d6712eb5f9301daa98bb177c2e9f90bc9fba9830ff3bc",
+          "localgp/model.py": "90eb01a94697abec5eb5fee94f416a0853a9a96da37ced9bf421bbd6bd1c4318",
+          "localgp/radio.py": "3377ee9e349761fcba2862208dc17a9f6ae261a5fffaa013e3e50510827fb183",
+          "localgp/rollout.py": "0ec51dabc3654616d6f516a7f2c900156fe6b24df1c44961a8d1424f33593861",
+          "localgp/train.py": "e4499fdd4f4e0e21990ae5edf3c4597074472320e57fef4cb09eba2a104b760b",
+          "localgp/trainer.py": "8d42b8e9db775a81b7fbdfa617ab8e339b26f2aa2dd88ff8d3ee1acf000f698c"
+        },
+        "python": "3.12.14",
+        "torch": "2.14.0",
+        "numpy": "2.5.2",
+        "scipy": "1.18.1",
+        "platform": "macOS-26.5.2-arm64-arm-64bit"
+      },
+      "evaluation_device": "mps",
+      "recorded_training_seconds": 117.55242029204965,
+      "report": "output/final-evaluation-seed17/report.html",
+      "comparison_sha256": "18a836d7143a079c223f59e7a5724b5294a03216b7b39821521654393c653771",
+      "summary": {
+        "team_return": {
+          "mean": 42.72046012068257,
+          "std": 10.364717968872158,
+          "n": 8
+        },
+        "mean_coverage": {
+          "mean": 0.588125,
+          "std": 0.08959388780571394,
+          "n": 8
+        },
+        "mean_throughput_bps": {
+          "mean": 8161500.292214278,
+          "std": 1136571.9683830468,
+          "n": 8
+        },
+        "mean_prediction_rmse": {
+          "mean": 0.9345156867012009,
+          "std": 0.149312160481792,
+          "n": 8
+        },
+        "final_coverage": {
+          "mean": 0.68,
+          "std": 0.25478282068123376,
+          "n": 8
+        },
+        "distance_m": {
+          "mean": 149.20372971662434,
+          "std": 7.576813357677475,
+          "n": 8
+        },
+        "collisions": {
+          "mean": 46.25,
+          "std": 7.3824115301167,
+          "n": 8
+        },
+        "duration_seconds": {
+          "mean": 64.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "delivered_megabits": {
+          "mean": 522.3360187017138,
+          "std": 72.74060597651498,
+          "n": 8
+        },
+        "horizon_coverage": {
+          "mean": 0.588125,
+          "std": 0.08959388780571394,
+          "n": 8
+        },
+        "horizon_throughput_bps": {
+          "mean": 8161500.292214278,
+          "std": 1136571.9683830468,
+          "n": 8
+        }
+      },
+      "episodes": [
+        {
+          "seed": 200000,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 34.741106919888836,
+          "mean_coverage": 0.49593750000000003,
+          "mean_throughput_bps": 8184122.587004758,
+          "mean_prediction_rmse": 1.0490772790024536,
+          "final_coverage": 0.9,
+          "distance_m": 143.72065676923378,
+          "collisions": 49,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 523.7838455683045,
+          "horizon_coverage": 0.49593750000000003,
+          "horizon_throughput_bps": 8184122.587004758
+        },
+        {
+          "seed": 200001,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 59.08443207468631,
+          "mean_coverage": 0.7521875,
+          "mean_throughput_bps": 9105412.862013511,
+          "mean_prediction_rmse": 0.6147950226268668,
+          "final_coverage": 0.44,
+          "distance_m": 149.74947949429045,
+          "collisions": 49,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 582.7464231688647,
+          "horizon_coverage": 0.7521875,
+          "horizon_throughput_bps": 9105412.862013511
+        },
+        {
+          "seed": 200002,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 44.96461244552192,
+          "mean_coverage": 0.6403125000000001,
+          "mean_throughput_bps": 9155659.437898844,
+          "mean_prediction_rmse": 1.0085452236621815,
+          "final_coverage": 0.78,
+          "distance_m": 166.64962476829533,
+          "collisions": 28,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 585.962204025526,
+          "horizon_coverage": 0.6403125000000001,
+          "horizon_throughput_bps": 9155659.437898844
+        },
+        {
+          "seed": 200003,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 26.848452703410917,
+          "mean_coverage": 0.45875,
+          "mean_throughput_bps": 6150346.366820574,
+          "mean_prediction_rmse": 1.1079412134392943,
+          "final_coverage": 0.86,
+          "distance_m": 144.27738349465653,
+          "collisions": 49,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 393.6221674765167,
+          "horizon_coverage": 0.45875,
+          "horizon_throughput_bps": 6150346.366820574
+        },
+        {
+          "seed": 200004,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 47.085544067054265,
+          "mean_coverage": 0.5715625000000001,
+          "mean_throughput_bps": 8453964.771693017,
+          "mean_prediction_rmse": 0.9467055131058757,
+          "final_coverage": 0.24,
+          "distance_m": 150.30477606109343,
+          "collisions": 49,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 541.0537453883531,
+          "horizon_coverage": 0.5715625000000001,
+          "horizon_throughput_bps": 8453964.771693017
+        },
+        {
+          "seed": 200005,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 37.8795060134981,
+          "mean_coverage": 0.6087499999999999,
+          "mean_throughput_bps": 7275570.044738513,
+          "mean_prediction_rmse": 0.8737006413580577,
+          "final_coverage": 0.86,
+          "distance_m": 144.60105200589163,
+          "collisions": 49,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 465.63648286326486,
+          "horizon_coverage": 0.6087499999999999,
+          "horizon_throughput_bps": 7275570.044738513
+        },
+        {
+          "seed": 200006,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 52.8168037914693,
+          "mean_coverage": 0.60625,
+          "mean_throughput_bps": 9493479.87401489,
+          "mean_prediction_rmse": 0.9122902374342154,
+          "final_coverage": 0.48,
+          "distance_m": 149.62758166471028,
+          "collisions": 48,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 607.5827119369529,
+          "horizon_coverage": 0.60625,
+          "horizon_throughput_bps": 9493479.87401489
+        },
+        {
+          "seed": 200007,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 38.343222949930905,
+          "mean_coverage": 0.57125,
+          "mean_throughput_bps": 7473446.39353012,
+          "mean_prediction_rmse": 0.9630703629806618,
+          "final_coverage": 0.88,
+          "distance_m": 144.6992834748234,
+          "collisions": 49,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 478.3005691859277,
+          "horizon_coverage": 0.57125,
+          "horizon_throughput_bps": 7473446.39353012
+        }
+      ]
+    },
+    {
+      "training_seed": 27,
+      "training_steps": 16384,
+      "selected_checkpoint_step": 16384,
+      "checkpoint_sha256": "da38dd16a9ed2ca8f4ccdda3ef7ce5a18adbf4183fb1e391d782251c1a0559eb",
+      "training_source_commits": [
+        "2758028144396005d150bf83cf713efe28a97cb1"
+      ],
+      "source_files_sha256": {
+        "localgp/__init__.py": "262c4416819c1e50c2e55adaf635dde151c5492495234c22dd14954a14817347",
+        "localgp/config.py": "b40b81d83ba8eeb8f3c29f2c2d1237f5a2e417ba299e0d73a1a5c0443ef4acc1",
+        "localgp/environment.py": "9cf751ec21dbc6da53036f429babeacf9c37c4618811eec05038bb76f50abbc6",
+        "localgp/evaluate.py": "56488200fc364d92e46fd0076e50e769b19a523cbe54108fec84c46825c69e4f",
+        "localgp/evaluation.py": "30fb22d9bce33c6309158ef153ccc34bad0f3d41db3ad479b026bda0a4cafde8",
+        "localgp/gp.py": "74170db5d4d63d48ed1d6712eb5f9301daa98bb177c2e9f90bc9fba9830ff3bc",
+        "localgp/model.py": "90eb01a94697abec5eb5fee94f416a0853a9a96da37ced9bf421bbd6bd1c4318",
+        "localgp/radio.py": "3377ee9e349761fcba2862208dc17a9f6ae261a5fffaa013e3e50510827fb183",
+        "localgp/rollout.py": "0ec51dabc3654616d6f516a7f2c900156fe6b24df1c44961a8d1424f33593861",
+        "localgp/train.py": "e4499fdd4f4e0e21990ae5edf3c4597074472320e57fef4cb09eba2a104b760b",
+        "localgp/trainer.py": "8d42b8e9db775a81b7fbdfa617ab8e339b26f2aa2dd88ff8d3ee1acf000f698c"
+      },
+      "evaluation_source": {
+        "commit": "60e6c297a02dd17c904a6fb1f8c9ad9cfdf2f065",
+        "dirty": false,
+        "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_files_sha256": {
+          "localgp/__init__.py": "262c4416819c1e50c2e55adaf635dde151c5492495234c22dd14954a14817347",
+          "localgp/config.py": "b40b81d83ba8eeb8f3c29f2c2d1237f5a2e417ba299e0d73a1a5c0443ef4acc1",
+          "localgp/environment.py": "9cf751ec21dbc6da53036f429babeacf9c37c4618811eec05038bb76f50abbc6",
+          "localgp/evaluate.py": "81aa9d43e336f3bbad3801b46bdd9bcec20e35cf788d508890a7ddbbd81ec475",
+          "localgp/evaluation.py": "b8c6159e826aa8e09fe7d0ca41fa57c0f2ca57781d0dfe6991d638b522f76af2",
+          "localgp/gp.py": "74170db5d4d63d48ed1d6712eb5f9301daa98bb177c2e9f90bc9fba9830ff3bc",
+          "localgp/model.py": "90eb01a94697abec5eb5fee94f416a0853a9a96da37ced9bf421bbd6bd1c4318",
+          "localgp/radio.py": "3377ee9e349761fcba2862208dc17a9f6ae261a5fffaa013e3e50510827fb183",
+          "localgp/rollout.py": "0ec51dabc3654616d6f516a7f2c900156fe6b24df1c44961a8d1424f33593861",
+          "localgp/train.py": "e4499fdd4f4e0e21990ae5edf3c4597074472320e57fef4cb09eba2a104b760b",
+          "localgp/trainer.py": "8d42b8e9db775a81b7fbdfa617ab8e339b26f2aa2dd88ff8d3ee1acf000f698c"
+        },
+        "python": "3.12.14",
+        "torch": "2.14.0",
+        "numpy": "2.5.2",
+        "scipy": "1.18.1",
+        "platform": "macOS-26.5.2-arm64-arm-64bit"
+      },
+      "evaluation_device": "mps",
+      "recorded_training_seconds": 117.82588579203002,
+      "report": "output/final-evaluation-seed27/report.html",
+      "comparison_sha256": "5f3e65a3b11051ad84ee2cb248ea6ef25d03a2cf92b30e08718db691991cd5ab",
+      "summary": {
+        "team_return": {
+          "mean": 63.28998696793113,
+          "std": 18.0005129744777,
+          "n": 8
+        },
+        "mean_coverage": {
+          "mean": 0.6048046874999999,
+          "std": 0.1507535885526296,
+          "n": 8
+        },
+        "mean_throughput_bps": {
+          "mean": 7387714.295403566,
+          "std": 1334731.4277314544,
+          "n": 8
+        },
+        "mean_prediction_rmse": {
+          "mean": 0.9421469538101209,
+          "std": 0.15342291034251931,
+          "n": 8
+        },
+        "final_coverage": {
+          "mean": 0.8300000000000001,
+          "std": 0.14966629547095767,
+          "n": 8
+        },
+        "distance_m": {
+          "mean": 195.15094256669545,
+          "std": 4.2218941888912855,
+          "n": 8
+        },
+        "collisions": {
+          "mean": 0.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "duration_seconds": {
+          "mean": 64.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "delivered_megabits": {
+          "mean": 472.81371490582825,
+          "std": 85.42281137481308,
+          "n": 8
+        },
+        "horizon_coverage": {
+          "mean": 0.6048046874999999,
+          "std": 0.1507535885526296,
+          "n": 8
+        },
+        "horizon_throughput_bps": {
+          "mean": 7387714.295403566,
+          "std": 1334731.4277314544,
+          "n": 8
+        }
+      },
+      "episodes": [
+        {
+          "seed": 200000,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 46.73149306560081,
+          "mean_coverage": 0.45187499999999997,
+          "mean_throughput_bps": 6596300.637203876,
+          "mean_prediction_rmse": 1.0713476016327619,
+          "final_coverage": 1.0,
+          "distance_m": 189.477628065506,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 422.16324078104805,
+          "horizon_coverage": 0.45187499999999997,
+          "horizon_throughput_bps": 6596300.637203876
+        },
+        {
+          "seed": 200001,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 94.51667963929835,
+          "mean_coverage": 0.89125,
+          "mean_throughput_bps": 9166950.302431569,
+          "mean_prediction_rmse": 0.6061310900712304,
+          "final_coverage": 0.92,
+          "distance_m": 199.19165261456513,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 586.6848193556203,
+          "horizon_coverage": 0.89125,
+          "horizon_throughput_bps": 9166950.302431569
+        },
+        {
+          "seed": 200002,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 66.43932059276554,
+          "mean_coverage": 0.51875,
+          "mean_throughput_bps": 8222165.029196611,
+          "mean_prediction_rmse": 1.0236659677204805,
+          "final_coverage": 0.66,
+          "distance_m": 201.14422061480585,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 526.218561868583,
+          "horizon_coverage": 0.51875,
+          "horizon_throughput_bps": 8222165.029196611
+        },
+        {
+          "seed": 200003,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 41.075567576442836,
+          "mean_coverage": 0.44718749999999996,
+          "mean_throughput_bps": 6193012.707276454,
+          "mean_prediction_rmse": 1.0680649089074086,
+          "final_coverage": 0.8,
+          "distance_m": 189.87074521847538,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 396.35281326569304,
+          "horizon_coverage": 0.44718749999999996,
+          "horizon_throughput_bps": 6193012.707276454
+        },
+        {
+          "seed": 200004,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 82.6023866712042,
+          "mean_coverage": 0.7375,
+          "mean_throughput_bps": 9294972.671375394,
+          "mean_prediction_rmse": 0.8510320808501712,
+          "final_coverage": 0.7,
+          "distance_m": 196.38439915969502,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 594.8782509680252,
+          "horizon_coverage": 0.7375,
+          "horizon_throughput_bps": 9294972.671375394
+        },
+        {
+          "seed": 200005,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 56.27410753351535,
+          "mean_coverage": 0.60375,
+          "mean_throughput_bps": 5825510.383472442,
+          "mean_prediction_rmse": 0.9440151050283622,
+          "final_coverage": 0.92,
+          "distance_m": 193.3594861947931,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 372.8326645422363,
+          "horizon_coverage": 0.60375,
+          "horizon_throughput_bps": 5825510.383472442
+        },
+        {
+          "seed": 200006,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 64.91004624098814,
+          "mean_coverage": 0.63625,
+          "mean_throughput_bps": 6945009.959496971,
+          "mean_prediction_rmse": 1.0012475110554058,
+          "final_coverage": 0.64,
+          "distance_m": 197.7110724839149,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 444.48063740780617,
+          "horizon_coverage": 0.63625,
+          "horizon_throughput_bps": 6945009.959496971
+        },
+        {
+          "seed": 200007,
+          "policy": "trained",
+          "steps": 64,
+          "team_return": 53.77029442363385,
+          "mean_coverage": 0.551875,
+          "mean_throughput_bps": 6857792.672775215,
+          "mean_prediction_rmse": 0.971671365215147,
+          "final_coverage": 1.0,
+          "distance_m": 194.06833618180823,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 438.89873105761376,
+          "horizon_coverage": 0.551875,
+          "horizon_throughput_bps": 6857792.672775215
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "horizon_coverage": {
+      "mean": 0.4979036458333333,
+      "std_across_training_seed_means": 0.17091659427357958,
+      "training_seeds": 3
+    },
+    "horizon_throughput_bps": {
+      "mean": 6728642.061622771,
+      "std_across_training_seed_means": 1852516.1249073588,
+      "training_seeds": 3
+    },
+    "delivered_megabits": {
+      "mean": 430.6330919438573,
+      "std_across_training_seed_means": 118.56103199407099,
+      "training_seeds": 3
+    },
+    "collisions": {
+      "mean": 22.958333333333332,
+      "std_across_training_seed_means": 23.126801731612897,
+      "training_seeds": 3
+    }
+  },
+  "baselines": {
+    "random": {
+      "policy": "random",
+      "seeds": [
+        200000,
+        200001,
+        200002,
+        200003,
+        200004,
+        200005,
+        200006,
+        200007
+      ],
+      "summary": {
+        "team_return": {
+          "mean": 19.24879939803423,
+          "std": 21.66041112367839,
+          "n": 8
+        },
+        "mean_coverage": {
+          "mean": 0.204765625,
+          "std": 0.1960081361911413,
+          "n": 8
+        },
+        "mean_throughput_bps": {
+          "mean": 3368348.928099281,
+          "std": 3029783.322990064,
+          "n": 8
+        },
+        "mean_prediction_rmse": {
+          "mean": 1.2833615748722287,
+          "std": 0.12278708419424368,
+          "n": 8
+        },
+        "final_coverage": {
+          "mean": 0.21000000000000002,
+          "std": 0.1854723699099141,
+          "n": 8
+        },
+        "distance_m": {
+          "mean": 192.45549593307334,
+          "std": 6.824511021041814,
+          "n": 8
+        },
+        "collisions": {
+          "mean": 0.125,
+          "std": 0.3535533905932738,
+          "n": 8
+        },
+        "duration_seconds": {
+          "mean": 64.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "delivered_megabits": {
+          "mean": 215.574331398354,
+          "std": 193.90613267136408,
+          "n": 8
+        },
+        "horizon_coverage": {
+          "mean": 0.204765625,
+          "std": 0.1960081361911413,
+          "n": 8
+        },
+        "horizon_throughput_bps": {
+          "mean": 3368348.928099281,
+          "std": 3029783.322990064,
+          "n": 8
+        }
+      },
+      "episodes": [
+        {
+          "seed": 200000,
+          "policy": "random",
+          "steps": 64,
+          "team_return": 1.6009338327364793,
+          "mean_coverage": 0.0,
+          "mean_throughput_bps": 0.0,
+          "mean_prediction_rmse": 1.402355488279937,
+          "final_coverage": 0.0,
+          "distance_m": 193.0746615396949,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 0.0,
+          "horizon_coverage": 0.0,
+          "horizon_throughput_bps": 0.0
+        },
+        {
+          "seed": 200001,
+          "policy": "random",
+          "steps": 64,
+          "team_return": 49.22507767009172,
+          "mean_coverage": 0.4112499999999999,
+          "mean_throughput_bps": 7998931.625168515,
+          "mean_prediction_rmse": 1.1021825836257602,
+          "final_coverage": 0.32,
+          "distance_m": 183.09859438453847,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 511.93162401078496,
+          "horizon_coverage": 0.4112499999999999,
+          "horizon_throughput_bps": 7998931.625168515
+        },
+        {
+          "seed": 200002,
+          "policy": "random",
+          "steps": 64,
+          "team_return": 17.78127064391895,
+          "mean_coverage": 0.29750000000000004,
+          "mean_throughput_bps": 5040937.929665262,
+          "mean_prediction_rmse": 1.2751886283366196,
+          "final_coverage": 0.34,
+          "distance_m": 189.01789385824304,
+          "collisions": 1,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 322.62002749857675,
+          "horizon_coverage": 0.29750000000000004,
+          "horizon_throughput_bps": 5040937.929665262
+        },
+        {
+          "seed": 200003,
+          "policy": "random",
+          "steps": 64,
+          "team_return": 1.5048827738976718,
+          "mean_coverage": 0.0,
+          "mean_throughput_bps": 0.0,
+          "mean_prediction_rmse": 1.3922544959908987,
+          "final_coverage": 0.0,
+          "distance_m": 186.77479378787442,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 0.0,
+          "horizon_coverage": 0.0,
+          "horizon_throughput_bps": 0.0
+        },
+        {
+          "seed": 200004,
+          "policy": "random",
+          "steps": 64,
+          "team_return": 55.84337224408196,
+          "mean_coverage": 0.5,
+          "mean_throughput_bps": 6092722.730945261,
+          "mean_prediction_rmse": 1.1025441803676705,
+          "final_coverage": 0.54,
+          "distance_m": 191.09976186825432,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 389.9342547804967,
+          "horizon_coverage": 0.5,
+          "horizon_throughput_bps": 6092722.730945261
+        },
+        {
+          "seed": 200005,
+          "policy": "random",
+          "steps": 64,
+          "team_return": 7.259534230367458,
+          "mean_coverage": 0.14375,
+          "mean_throughput_bps": 2639331.11652118,
+          "mean_prediction_rmse": 1.3107395582305688,
+          "final_coverage": 0.16,
+          "distance_m": 193.2560084421891,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 168.91719145735553,
+          "horizon_coverage": 0.14375,
+          "horizon_throughput_bps": 2639331.11652118
+        },
+        {
+          "seed": 200006,
+          "policy": "random",
+          "steps": 64,
+          "team_return": 18.04417799883261,
+          "mean_coverage": 0.275625,
+          "mean_throughput_bps": 4606390.920459422,
+          "mean_prediction_rmse": 1.2834517154398508,
+          "final_coverage": 0.22,
+          "distance_m": 198.342310507442,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 294.80901890940305,
+          "horizon_coverage": 0.275625,
+          "horizon_throughput_bps": 4606390.920459422
+        },
+        {
+          "seed": 200007,
+          "policy": "random",
+          "steps": 64,
+          "team_return": 2.731145790346975,
+          "mean_coverage": 0.010000000000000002,
+          "mean_throughput_bps": 568477.1020346092,
+          "mean_prediction_rmse": 1.3981759487065253,
+          "final_coverage": 0.1,
+          "distance_m": 204.97994307635057,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 36.38253453021499,
+          "horizon_coverage": 0.010000000000000002,
+          "horizon_throughput_bps": 568477.1020346092
+        }
+      ]
+    },
+    "greedy": {
+      "policy": "greedy",
+      "seeds": [
+        200000,
+        200001,
+        200002,
+        200003,
+        200004,
+        200005,
+        200006,
+        200007
+      ],
+      "summary": {
+        "team_return": {
+          "mean": 44.59886240108722,
+          "std": 17.986047956026777,
+          "n": 8
+        },
+        "mean_coverage": {
+          "mean": 0.576834375,
+          "std": 0.06212747291355892,
+          "n": 8
+        },
+        "mean_throughput_bps": {
+          "mean": 5157016.72331306,
+          "std": 1072130.6495162887,
+          "n": 8
+        },
+        "mean_prediction_rmse": {
+          "mean": 0.9895708379006339,
+          "std": 0.09577478849891655,
+          "n": 8
+        },
+        "final_coverage": {
+          "mean": 0.69,
+          "std": 0.1430284686946723,
+          "n": 8
+        },
+        "distance_m": {
+          "mean": 205.45770372545707,
+          "std": 48.01834017696227,
+          "n": 8
+        },
+        "collisions": {
+          "mean": 42.125,
+          "std": 38.076755188885066,
+          "n": 8
+        },
+        "duration_seconds": {
+          "mean": 60.5,
+          "std": 6.48074069840786,
+          "n": 8
+        },
+        "delivered_megabits": {
+          "mean": 308.2863261933845,
+          "std": 53.1327476120356,
+          "n": 8
+        },
+        "horizon_coverage": {
+          "mean": 0.549140625,
+          "std": 0.10450894287392345,
+          "n": 8
+        },
+        "horizon_throughput_bps": {
+          "mean": 4816973.846771633,
+          "std": 830199.1814380564,
+          "n": 8
+        }
+      },
+      "episodes": [
+        {
+          "seed": 200000,
+          "policy": "greedy",
+          "steps": 64,
+          "team_return": 39.26795966008572,
+          "mean_coverage": 0.6331249999999999,
+          "mean_throughput_bps": 6472224.808449421,
+          "mean_prediction_rmse": 0.8992345025908279,
+          "final_coverage": 0.94,
+          "distance_m": 232.35096414997832,
+          "collisions": 52,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 414.22238774076294,
+          "horizon_coverage": 0.6331249999999999,
+          "horizon_throughput_bps": 6472224.808449421
+        },
+        {
+          "seed": 200001,
+          "policy": "greedy",
+          "steps": 64,
+          "team_return": 24.814189951062115,
+          "mean_coverage": 0.578125,
+          "mean_throughput_bps": 3675213.636461087,
+          "mean_prediction_rmse": 1.0251391770124405,
+          "final_coverage": 0.58,
+          "distance_m": 128.22271957353811,
+          "collisions": 97,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 235.21367273350958,
+          "horizon_coverage": 0.578125,
+          "horizon_throughput_bps": 3675213.636461087
+        },
+        {
+          "seed": 200002,
+          "policy": "greedy",
+          "steps": 50,
+          "team_return": 51.65904747698263,
+          "mean_coverage": 0.4912,
+          "mean_throughput_bps": 5681010.792384723,
+          "mean_prediction_rmse": 1.0857650887778945,
+          "final_coverage": 0.5,
+          "distance_m": 276.179365389113,
+          "collisions": 0,
+          "duration_seconds": 50.0,
+          "delivered_megabits": 284.0505396192362,
+          "horizon_coverage": 0.38375000000000004,
+          "horizon_throughput_bps": 4438289.681550565
+        },
+        {
+          "seed": 200003,
+          "policy": "greedy",
+          "steps": 64,
+          "team_return": 16.199907995837084,
+          "mean_coverage": 0.5406250000000001,
+          "mean_throughput_bps": 4198195.33459547,
+          "mean_prediction_rmse": 1.054691010181536,
+          "final_coverage": 0.7,
+          "distance_m": 169.30317717839688,
+          "collisions": 78,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 268.68450141411006,
+          "horizon_coverage": 0.5406250000000001,
+          "horizon_throughput_bps": 4198195.33459547
+        },
+        {
+          "seed": 200004,
+          "policy": "greedy",
+          "steps": 64,
+          "team_return": 48.15047620437421,
+          "mean_coverage": 0.5659375,
+          "mean_throughput_bps": 4657558.125583081,
+          "mean_prediction_rmse": 0.9685140465036849,
+          "final_coverage": 0.58,
+          "distance_m": 176.10672837177583,
+          "collisions": 62,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 298.08372003731716,
+          "horizon_coverage": 0.5659375,
+          "horizon_throughput_bps": 4657558.125583081
+        },
+        {
+          "seed": 200005,
+          "policy": "greedy",
+          "steps": 64,
+          "team_return": 74.4245666677104,
+          "mean_coverage": 0.6840625,
+          "mean_throughput_bps": 4929074.603615422,
+          "mean_prediction_rmse": 0.8504667361493237,
+          "final_coverage": 0.82,
+          "distance_m": 247.40074570237306,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 315.460774631387,
+          "horizon_coverage": 0.6840625,
+          "horizon_throughput_bps": 4929074.603615422
+        },
+        {
+          "seed": 200006,
+          "policy": "greedy",
+          "steps": 50,
+          "team_return": 51.68323683962194,
+          "mean_coverage": 0.5216000000000001,
+          "mean_throughput_bps": 6754842.978273175,
+          "mean_prediction_rmse": 1.1165263229506819,
+          "final_coverage": 0.66,
+          "distance_m": 190.96526560579252,
+          "collisions": 0,
+          "duration_seconds": 50.0,
+          "delivered_megabits": 337.74214891365875,
+          "horizon_coverage": 0.40750000000000003,
+          "horizon_throughput_bps": 5277221.076775918
+        },
+        {
+          "seed": 200007,
+          "policy": "greedy",
+          "steps": 64,
+          "team_return": 50.591514413023674,
+          "mean_coverage": 0.6000000000000001,
+          "mean_throughput_bps": 4888013.5071421005,
+          "mean_prediction_rmse": 0.916229819038683,
+          "final_coverage": 0.74,
+          "distance_m": 223.132663832689,
+          "collisions": 48,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 312.83286445709444,
+          "horizon_coverage": 0.6000000000000001,
+          "horizon_throughput_bps": 4888013.5071421005
+        }
+      ]
+    },
+    "stationary": {
+      "policy": "stationary",
+      "seeds": [
+        200000,
+        200001,
+        200002,
+        200003,
+        200004,
+        200005,
+        200006,
+        200007
+      ],
+      "summary": {
+        "team_return": {
+          "mean": 21.57348086666672,
+          "std": 21.667757681179403,
+          "n": 8
+        },
+        "mean_coverage": {
+          "mean": 0.20460937499999998,
+          "std": 0.22416379521915122,
+          "n": 8
+        },
+        "mean_throughput_bps": {
+          "mean": 3240245.8870858317,
+          "std": 3187441.1910646553,
+          "n": 8
+        },
+        "mean_prediction_rmse": {
+          "mean": 1.3543335299035617,
+          "std": 0.06174230503302067,
+          "n": 8
+        },
+        "final_coverage": {
+          "mean": 0.2025,
+          "std": 0.22102036105300343,
+          "n": 8
+        },
+        "distance_m": {
+          "mean": 0.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "collisions": {
+          "mean": 0.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "duration_seconds": {
+          "mean": 64.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "delivered_megabits": {
+          "mean": 207.3757367734932,
+          "std": 203.99623622813797,
+          "n": 8
+        },
+        "horizon_coverage": {
+          "mean": 0.20460937499999998,
+          "std": 0.22416379521915122,
+          "n": 8
+        },
+        "horizon_throughput_bps": {
+          "mean": 3240245.8870858317,
+          "std": 3187441.1910646553,
+          "n": 8
+        }
+      },
+      "episodes": [
+        {
+          "seed": 200000,
+          "policy": "stationary",
+          "steps": 64,
+          "team_return": 2.2277174949880387,
+          "mean_coverage": 0.0,
+          "mean_throughput_bps": 0.0,
+          "mean_prediction_rmse": 1.4042639786832662,
+          "final_coverage": 0.0,
+          "distance_m": 0.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 0.0,
+          "horizon_coverage": 0.0,
+          "horizon_throughput_bps": 0.0
+        },
+        {
+          "seed": 200001,
+          "policy": "stationary",
+          "steps": 64,
+          "team_return": 59.27302792836442,
+          "mean_coverage": 0.51125,
+          "mean_throughput_bps": 8550816.351353262,
+          "mean_prediction_rmse": 1.2235194052088318,
+          "final_coverage": 0.5,
+          "distance_m": 0.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 547.2522464866088,
+          "horizon_coverage": 0.51125,
+          "horizon_throughput_bps": 8550816.351353262
+        },
+        {
+          "seed": 200002,
+          "policy": "stationary",
+          "steps": 64,
+          "team_return": 35.216250716017356,
+          "mean_coverage": 0.30250000000000005,
+          "mean_throughput_bps": 4758476.822537826,
+          "mean_prediction_rmse": 1.352629988180007,
+          "final_coverage": 0.28,
+          "distance_m": 0.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 304.5425166424209,
+          "horizon_coverage": 0.30250000000000005,
+          "horizon_throughput_bps": 4758476.822537826
+        },
+        {
+          "seed": 200003,
+          "policy": "stationary",
+          "steps": 64,
+          "team_return": 2.6590892523665617,
+          "mean_coverage": 0.0,
+          "mean_throughput_bps": 0.0,
+          "mean_prediction_rmse": 1.3922641571873096,
+          "final_coverage": 0.0,
+          "distance_m": 0.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 0.0,
+          "horizon_coverage": 0.0,
+          "horizon_throughput_bps": 0.0
+        },
+        {
+          "seed": 200004,
+          "policy": "stationary",
+          "steps": 64,
+          "team_return": 38.624072776624885,
+          "mean_coverage": 0.47531249999999997,
+          "mean_throughput_bps": 5527542.760386951,
+          "mean_prediction_rmse": 1.3075245820034287,
+          "final_coverage": 0.46,
+          "distance_m": 0.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 353.7627366647649,
+          "horizon_coverage": 0.47531249999999997,
+          "horizon_throughput_bps": 5527542.760386951
+        },
+        {
+          "seed": 200005,
+          "policy": "stationary",
+          "steps": 64,
+          "team_return": 4.7096607520168785,
+          "mean_coverage": 0.02,
+          "mean_throughput_bps": 2182568.5245328844,
+          "mean_prediction_rmse": 1.3673582002215965,
+          "final_coverage": 0.02,
+          "distance_m": 0.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 139.6843855701046,
+          "horizon_coverage": 0.02,
+          "horizon_throughput_bps": 2182568.5245328844
+        },
+        {
+          "seed": 200006,
+          "policy": "stationary",
+          "steps": 64,
+          "team_return": 26.853393086888794,
+          "mean_coverage": 0.3278125,
+          "mean_throughput_bps": 4902562.637875727,
+          "mean_prediction_rmse": 1.3835399332589302,
+          "final_coverage": 0.36,
+          "distance_m": 0.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 313.7640088240465,
+          "horizon_coverage": 0.3278125,
+          "horizon_throughput_bps": 4902562.637875727
+        },
+        {
+          "seed": 200007,
+          "policy": "stationary",
+          "steps": 64,
+          "team_return": 3.0246349260668066,
+          "mean_coverage": 0.0,
+          "mean_throughput_bps": 0.0,
+          "mean_prediction_rmse": 1.403567994485124,
+          "final_coverage": 0.0,
+          "distance_m": 0.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 0.0,
+          "horizon_coverage": 0.0,
+          "horizon_throughput_bps": 0.0
+        }
+      ]
+    }
+  }
+}

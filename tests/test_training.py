@@ -142,3 +142,16 @@ def test_early_termination_service_is_compared_on_fixed_horizon():
     assert result['horizon_throughput_bps']==pytest.approx(result['mean_throughput_bps']*result['steps']/ec.horizon)
     assert result['delivered_megabits']==pytest.approx(result['mean_throughput_bps']*result['duration_seconds']/1e6)
     assert result['horizon_coverage']<=result['mean_coverage']
+
+
+def test_geometry_only_baseline_requires_no_belief_for_its_actions():
+    from localgp.evaluation import episode
+    ec,tc=configs()
+    trainer=Trainer(ec,tc)
+    result=episode(trainer,1000,policy='straight',trace=True)
+    frames=result['frames']
+    initial=np.asarray(frames[0]['positions'])
+    final=np.asarray(frames[-1]['positions'])
+    np.testing.assert_allclose(final[:,0]-initial[:,0],ec.horizon*ec.dt*ec.max_speed/2)
+    np.testing.assert_array_equal(final[:,1],initial[:,1])
+    assert result['collisions']==0

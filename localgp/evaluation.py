@@ -45,6 +45,11 @@ def episode(trainer, seed, policy='trained', trace=False):
             action=rng.uniform(-1,1,(env.config.agents,2))
         elif policy=='greedy':
             action=greedy_action(env)
+        elif policy=='straight':
+            # Geometry-only diagnostic: every agent starts on the western edge.
+            # Fly east at half maximum speed, stopping exactly at the boundary.
+            speed=np.minimum(.5,(env.config.area_size-env.positions[:,0])/(env.config.max_speed*env.config.dt))
+            action=np.column_stack((np.full(env.config.agents,-1.),2*speed-1))
         elif policy=='stationary':
             action=np.full((env.config.agents,2),-1.)
         else:
@@ -85,11 +90,11 @@ def evaluate(trainer, count, seed, policy='trained'):
 
 
 def compare(trainer, count, seed):
-    results={policy:evaluate(trainer,count,seed,policy) for policy in ('trained','random','greedy','stationary')}
+    results={policy:evaluate(trainer,count,seed,policy) for policy in ('trained','random','greedy','straight','stationary')}
     # Paired scene differences, not confidence intervals over training seeds.
     trained=results['trained']['episodes']
     differences={}
-    for policy in ('random','greedy','stationary'):
+    for policy in ('random','greedy','straight','stationary'):
         differences[policy]={metric:[a[metric]-b[metric] for a,b in zip(trained,results[policy]['episodes'])]
                              for metric in ('mean_coverage','mean_throughput_bps','horizon_coverage','horizon_throughput_bps')}
     return dict(results=results,paired_differences=differences,
