@@ -6,7 +6,7 @@
 
 > 新版是对原问题的可审计实验实现，不宣称精确复现论文，也不把新结果与旧版曲线直接拼接。建模假设、奖励的局限和验证标准见 [第一性原理说明](docs/first-principles.md)。
 
-[本机三种子实验结果与复现记录](docs/experiments/mps-2026-09-06.md)：MPS 共完成 49,152 个环境步，63 项测试通过。初步结果显示吞吐量改善，但覆盖率和训练稳定性仍需改进。
+[本机三种子实验结果与复现记录](docs/experiments/mps-2026-09-06.md)：MPS 共完成 49,152 个环境步，64 项测试通过。固定向右半速基线强于本轮训练策略，尚未证明 GP 的额外收益；报告保留这一诊断与后续改进方向。
 
 ## 在 Mac 上训练
 
@@ -35,7 +35,7 @@ python -m localgp.train --config configs/mac.json --output output/mps-seed7
 python -m localgp.train --config configs/mac.json --steps 8192 \
   --resume output/mps-seed7/last.pt --output output/mps-seed7-resumed
 
-# 独立测试种子，配对比较训练策略、随机、感知贪心、原地不动
+# 独立测试种子，配对比较训练策略、随机、感知贪心、固定向右半速、原地不动
 python -m localgp.evaluate output/mps-seed7/best.pt \
   --device mps --episodes 8 --seed 200000 --output output/mps-evaluation
 

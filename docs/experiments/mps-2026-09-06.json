@@ -61,7 +61,9 @@
       "movement_weight": 0.03,
       "collision_weight": 1.0
     },
+    "geometry_diagnostic": "Straight east at half speed, using geometry only; added after initial evaluation without model reselection",
     "limitations": [
+      "Fixed western starts and central user clusters favor geometry-only motion; GP contribution not established",
       "Exploratory channel model, not a calibrated paper reproduction",
       "Three training seeds and eight test scenarios are a pilot, not a significance claim",
       "Collision counters denote rejected moves, not physical collisions",
@@ -92,7 +94,7 @@
         "localgp/trainer.py": "9990c64ad617c4bdfac9f181960bcbd2017a22d54b74a09aa51671309b0bdd61"
       },
       "evaluation_source": {
-        "commit": "60e6c297a02dd17c904a6fb1f8c9ad9cfdf2f065",
+        "commit": "08fb12057d0038be14b65aeff647b3035c0a51a4",
         "dirty": false,
         "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "source_files_sha256": {
@@ -100,7 +102,7 @@
           "localgp/config.py": "b40b81d83ba8eeb8f3c29f2c2d1237f5a2e417ba299e0d73a1a5c0443ef4acc1",
           "localgp/environment.py": "9cf751ec21dbc6da53036f429babeacf9c37c4618811eec05038bb76f50abbc6",
           "localgp/evaluate.py": "81aa9d43e336f3bbad3801b46bdd9bcec20e35cf788d508890a7ddbbd81ec475",
-          "localgp/evaluation.py": "b8c6159e826aa8e09fe7d0ca41fa57c0f2ca57781d0dfe6991d638b522f76af2",
+          "localgp/evaluation.py": "acd5c66adab181f2ed74a81e01cf50fa30179112b6344f68415da9bdfbb972b8",
           "localgp/gp.py": "74170db5d4d63d48ed1d6712eb5f9301daa98bb177c2e9f90bc9fba9830ff3bc",
           "localgp/model.py": "90eb01a94697abec5eb5fee94f416a0853a9a96da37ced9bf421bbd6bd1c4318",
           "localgp/radio.py": "3377ee9e349761fcba2862208dc17a9f6ae261a5fffaa013e3e50510827fb183",
@@ -116,8 +118,8 @@
       },
       "evaluation_device": "mps",
       "recorded_training_seconds": 117.96353558287956,
-      "report": "output/final-evaluation-seed7/report.html",
-      "comparison_sha256": "9ab8b4eb0240cbc1b6e195186e492b0c571932cd3d3ae7145898fcba70c931e3",
+      "report": "output/study-seed7/report.html",
+      "comparison_sha256": "1b1af2c0e61d3a203952df3cbfad6ee164168b6aef8d19d6a9f23f9fc703039e",
       "summary": {
         "team_return": {
           "mean": 23.768283095875482,
@@ -328,7 +330,7 @@
         "localgp/trainer.py": "8d42b8e9db775a81b7fbdfa617ab8e339b26f2aa2dd88ff8d3ee1acf000f698c"
       },
       "evaluation_source": {
-        "commit": "60e6c297a02dd17c904a6fb1f8c9ad9cfdf2f065",
+        "commit": "08fb12057d0038be14b65aeff647b3035c0a51a4",
         "dirty": false,
         "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "source_files_sha256": {
@@ -336,7 +338,7 @@
           "localgp/config.py": "b40b81d83ba8eeb8f3c29f2c2d1237f5a2e417ba299e0d73a1a5c0443ef4acc1",
           "localgp/environment.py": "9cf751ec21dbc6da53036f429babeacf9c37c4618811eec05038bb76f50abbc6",
           "localgp/evaluate.py": "81aa9d43e336f3bbad3801b46bdd9bcec20e35cf788d508890a7ddbbd81ec475",
-          "localgp/evaluation.py": "b8c6159e826aa8e09fe7d0ca41fa57c0f2ca57781d0dfe6991d638b522f76af2",
+          "localgp/evaluation.py": "acd5c66adab181f2ed74a81e01cf50fa30179112b6344f68415da9bdfbb972b8",
           "localgp/gp.py": "74170db5d4d63d48ed1d6712eb5f9301daa98bb177c2e9f90bc9fba9830ff3bc",
           "localgp/model.py": "90eb01a94697abec5eb5fee94f416a0853a9a96da37ced9bf421bbd6bd1c4318",
           "localgp/radio.py": "3377ee9e349761fcba2862208dc17a9f6ae261a5fffaa013e3e50510827fb183",
@@ -352,8 +354,8 @@
       },
       "evaluation_device": "mps",
       "recorded_training_seconds": 117.55242029204965,
-      "report": "output/final-evaluation-seed17/report.html",
-      "comparison_sha256": "18a836d7143a079c223f59e7a5724b5294a03216b7b39821521654393c653771",
+      "report": "output/study-seed17/report.html",
+      "comparison_sha256": "d3426fd5795aef448949d607dd0194b9dc918aa274a2d36355d60e9b4cd8c8f0",
       "summary": {
         "team_return": {
           "mean": 42.72046012068257,
@@ -564,7 +566,7 @@
         "localgp/trainer.py": "8d42b8e9db775a81b7fbdfa617ab8e339b26f2aa2dd88ff8d3ee1acf000f698c"
       },
       "evaluation_source": {
-        "commit": "60e6c297a02dd17c904a6fb1f8c9ad9cfdf2f065",
+        "commit": "08fb12057d0038be14b65aeff647b3035c0a51a4",
         "dirty": false,
         "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "source_files_sha256": {
@@ -572,7 +574,7 @@
           "localgp/config.py": "b40b81d83ba8eeb8f3c29f2c2d1237f5a2e417ba299e0d73a1a5c0443ef4acc1",
           "localgp/environment.py": "9cf751ec21dbc6da53036f429babeacf9c37c4618811eec05038bb76f50abbc6",
           "localgp/evaluate.py": "81aa9d43e336f3bbad3801b46bdd9bcec20e35cf788d508890a7ddbbd81ec475",
-          "localgp/evaluation.py": "b8c6159e826aa8e09fe7d0ca41fa57c0f2ca57781d0dfe6991d638b522f76af2",
+          "localgp/evaluation.py": "acd5c66adab181f2ed74a81e01cf50fa30179112b6344f68415da9bdfbb972b8",
           "localgp/gp.py": "74170db5d4d63d48ed1d6712eb5f9301daa98bb177c2e9f90bc9fba9830ff3bc",
           "localgp/model.py": "90eb01a94697abec5eb5fee94f416a0853a9a96da37ced9bf421bbd6bd1c4318",
           "localgp/radio.py": "3377ee9e349761fcba2862208dc17a9f6ae261a5fffaa013e3e50510827fb183",
@@ -588,8 +590,8 @@
       },
       "evaluation_device": "mps",
       "recorded_training_seconds": 117.82588579203002,
-      "report": "output/final-evaluation-seed27/report.html",
-      "comparison_sha256": "5f3e65a3b11051ad84ee2cb248ea6ef25d03a2cf92b30e08718db691991cd5ab",
+      "report": "output/study-seed27/report.html",
+      "comparison_sha256": "da82125dcaca1a916a29eba55c039e36a655dfa585b897e5c80d9dd8ca913abd",
       "summary": {
         "team_return": {
           "mean": 63.28998696793113,
@@ -1199,6 +1201,206 @@
           "delivered_megabits": 312.83286445709444,
           "horizon_coverage": 0.6000000000000001,
           "horizon_throughput_bps": 4888013.5071421005
+        }
+      ]
+    },
+    "straight": {
+      "policy": "straight",
+      "seeds": [
+        200000,
+        200001,
+        200002,
+        200003,
+        200004,
+        200005,
+        200006,
+        200007
+      ],
+      "summary": {
+        "team_return": {
+          "mean": 70.41760052552206,
+          "std": 9.708524506545473,
+          "n": 8
+        },
+        "mean_coverage": {
+          "mean": 0.6201953124999999,
+          "std": 0.06464962605456846,
+          "n": 8
+        },
+        "mean_throughput_bps": {
+          "mean": 8688831.627157634,
+          "std": 1799048.2524064702,
+          "n": 8
+        },
+        "mean_prediction_rmse": {
+          "mean": 0.8372213256945922,
+          "std": 0.14138071626173945,
+          "n": 8
+        },
+        "final_coverage": {
+          "mean": 0.6475,
+          "std": 0.26337100393605545,
+          "n": 8
+        },
+        "distance_m": {
+          "mean": 192.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "collisions": {
+          "mean": 0.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "duration_seconds": {
+          "mean": 64.0,
+          "std": 0.0,
+          "n": 8
+        },
+        "delivered_megabits": {
+          "mean": 556.0852241380887,
+          "std": 115.13908815401412,
+          "n": 8
+        },
+        "horizon_coverage": {
+          "mean": 0.6201953124999999,
+          "std": 0.06464962605456846,
+          "n": 8
+        },
+        "horizon_throughput_bps": {
+          "mean": 8688831.627157634,
+          "std": 1799048.2524064702,
+          "n": 8
+        }
+      },
+      "episodes": [
+        {
+          "seed": 200000,
+          "policy": "straight",
+          "steps": 64,
+          "team_return": 60.26108837941714,
+          "mean_coverage": 0.53875,
+          "mean_throughput_bps": 7447266.724886219,
+          "mean_prediction_rmse": 1.0098158377934197,
+          "final_coverage": 1.0,
+          "distance_m": 192.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 476.62507039271804,
+          "horizon_coverage": 0.53875,
+          "horizon_throughput_bps": 7447266.724886219
+        },
+        {
+          "seed": 200001,
+          "policy": "straight",
+          "steps": 64,
+          "team_return": 84.58978688906933,
+          "mean_coverage": 0.739375,
+          "mean_throughput_bps": 9450409.391259275,
+          "mean_prediction_rmse": 0.5275014169544743,
+          "final_coverage": 0.22,
+          "distance_m": 192.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 604.8262010405937,
+          "horizon_coverage": 0.739375,
+          "horizon_throughput_bps": 9450409.391259275
+        },
+        {
+          "seed": 200002,
+          "policy": "straight",
+          "steps": 64,
+          "team_return": 76.65851429383363,
+          "mean_coverage": 0.58375,
+          "mean_throughput_bps": 10926503.070934692,
+          "mean_prediction_rmse": 0.8603395294898883,
+          "final_coverage": 0.6,
+          "distance_m": 192.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 699.2961965398204,
+          "horizon_coverage": 0.58375,
+          "horizon_throughput_bps": 10926503.070934692
+        },
+        {
+          "seed": 200003,
+          "policy": "straight",
+          "steps": 64,
+          "team_return": 59.88856284497445,
+          "mean_coverage": 0.5528124999999999,
+          "mean_throughput_bps": 6808761.611907725,
+          "mean_prediction_rmse": 0.881459620732449,
+          "final_coverage": 0.92,
+          "distance_m": 192.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 435.7607431620944,
+          "horizon_coverage": 0.5528124999999999,
+          "horizon_throughput_bps": 6808761.611907725
+        },
+        {
+          "seed": 200004,
+          "policy": "straight",
+          "steps": 64,
+          "team_return": 74.80535565160623,
+          "mean_coverage": 0.6384375,
+          "mean_throughput_bps": 9680211.014581613,
+          "mean_prediction_rmse": 0.7953839430480436,
+          "final_coverage": 0.44,
+          "distance_m": 192.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 619.5335049332233,
+          "horizon_coverage": 0.6384375,
+          "horizon_throughput_bps": 9680211.014581613
+        },
+        {
+          "seed": 200005,
+          "policy": "straight",
+          "steps": 64,
+          "team_return": 61.05750640731506,
+          "mean_coverage": 0.659375,
+          "mean_throughput_bps": 6350510.4600212155,
+          "mean_prediction_rmse": 0.8794955327383165,
+          "final_coverage": 0.66,
+          "distance_m": 192.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 406.4326694413578,
+          "horizon_coverage": 0.659375,
+          "horizon_throughput_bps": 6350510.4600212155
+        },
+        {
+          "seed": 200006,
+          "policy": "straight",
+          "steps": 64,
+          "team_return": 79.5728055614388,
+          "mean_coverage": 0.6425,
+          "mean_throughput_bps": 10917259.21621778,
+          "mean_prediction_rmse": 0.8181666048944316,
+          "final_coverage": 0.5,
+          "distance_m": 192.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 698.704589837938,
+          "horizon_coverage": 0.6425,
+          "horizon_throughput_bps": 10917259.21621778
+        },
+        {
+          "seed": 200007,
+          "policy": "straight",
+          "steps": 64,
+          "team_return": 66.50718417652195,
+          "mean_coverage": 0.6065625,
+          "mean_throughput_bps": 7929731.527452558,
+          "mean_prediction_rmse": 0.9256081199057147,
+          "final_coverage": 0.84,
+          "distance_m": 192.0,
+          "collisions": 0,
+          "duration_seconds": 64.0,
+          "delivered_megabits": 507.50281775696374,
+          "horizon_coverage": 0.6065625,
+          "horizon_throughput_bps": 7929731.527452558
         }
       ]
     },
