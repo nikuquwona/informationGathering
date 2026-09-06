@@ -19,6 +19,7 @@ class EnvConfig:
     min_separation: float = 2.0
     user_speed_std: float = 0.3
     altitude: float = 10.0
+    min_altitude: float = 5.0
     mu_power: float = 0.2
     aebs_power: float = 1.0
     bandwidth: float = 1e6
@@ -36,6 +37,8 @@ class EnvConfig:
     gp_axis: int = 3
     gp_max_samples: int = 48
     gp_max_age: int = 64
+    scenario: str = 'legacy'
+    map_family: str = 'standard'
     reward: str = 'balanced'
     signal_weight: float = 1.0
     information_weight: float = 0.5
@@ -53,10 +56,14 @@ class EnvConfig:
         nonnegative = {'user_speed_std', 'measurement_noise', 'nlos_extra_db', 'signal_weight', 'information_weight', 'movement_weight', 'collision_weight'}
         for field in fields(self):
             value = getattr(self, field.name)
-            if field.name not in integer_names and field.name != 'reward' and (type(value) not in (int, float) or not math.isfinite(value) or value < 0 or (value == 0 and field.name not in nonnegative)):
+            if field.name not in integer_names and field.name not in ('reward','scenario','map_family') and (type(value) not in (int, float) or not math.isfinite(value) or value < 0 or (value == 0 and field.name not in nonnegative)):
                 raise ValueError(f'{field.name} must be finite and positive (or a permitted zero)')
         if self.min_separation * (self.agents - 1) >= self.area_size * 0.7:
             raise ValueError('Initial fleet cannot fit with the requested separation')
+        if self.altitude < self.min_altitude:
+            raise ValueError('altitude must be at least min_altitude')
+        if self.scenario not in ('legacy','generalized') or self.map_family not in ('standard','elongated'):
+            raise ValueError('Unknown scenario or map family')
         if self.reward not in ('balanced', 'mean_change'):
             raise ValueError('reward must be balanced or mean_change')
 

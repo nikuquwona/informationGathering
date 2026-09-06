@@ -33,9 +33,9 @@ class Encoder(nn.Module):
 
 
 class Actor(nn.Module):
-    def __init__(self, context_dim, hidden=64):
+    def __init__(self, context_dim, hidden=64, channels=2):
         super().__init__()
-        self.encoder = Encoder(2,context_dim,hidden)
+        self.encoder = Encoder(channels,context_dim,hidden)
         self.mean = nn.Linear(hidden,2)
         nn.init.orthogonal_(self.mean.weight, .01)
         nn.init.zeros_(self.mean.bias)
@@ -59,9 +59,9 @@ class Actor(nn.Module):
 
 
 class Critic(nn.Module):
-    def __init__(self, context_dim, hidden=64):
+    def __init__(self, context_dim, hidden=64, channels=3):
         super().__init__()
-        self.encoder = Encoder(3,context_dim,hidden)
+        self.encoder = Encoder(channels,context_dim,hidden)
         self.value = nn.Linear(hidden,1)
 
     def forward(self, maps, context):

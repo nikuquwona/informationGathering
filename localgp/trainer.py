@@ -14,7 +14,7 @@ import numpy as np
 import scipy
 import torch
 from threadpoolctl import threadpool_limits
-from .config import config_dict
+from .config import config_dict, EnvConfig, TrainConfig
 from .environment import DeploymentEnv
 from .model import Actor, Critic, as_tensor, select_device
 from .rollout import Rollout
@@ -50,8 +50,8 @@ class Trainer:
         self.shuffle_rng = torch.Generator(device='cpu').manual_seed(training_config.seed+2)
         self.env = DeploymentEnv(environment_config,training_config.seed)
         obs, central = self.env.observe(), self.env.central_state()
-        self.actor = Actor(obs['context'].shape[-1], training_config.hidden_size).to(self.device)
-        self.critic = Critic(central['context'].shape[-1], training_config.hidden_size).to(self.device)
+        self.actor = Actor(obs['context'].shape[-1], training_config.hidden_size, obs['maps'].shape[1]).to(self.device)
+        self.critic = Critic(central['context'].shape[-1], training_config.hidden_size, central['maps'].shape[1]).to(self.device)
         self.optimizer = torch.optim.Adam(list(self.actor.parameters())+list(self.critic.parameters()),lr=training_config.learning_rate,eps=1e-5)
         self.total_steps,self.updates,self.episodes = 0,0,0
         self.episode_return = 0.0
@@ -162,7 +162,7 @@ class Trainer:
         payload=torch.load(path,map_location='cpu',weights_only=True)
         if payload.get('schema_version')!=1:
             raise ValueError('Unsupported checkpoint schema')
-        saved=copy.deepcopy(payload['configuration'])
+        saved=config_dict(EnvConfig(**payload['configuration']['environment']),TrainConfig(**payload['configuration']['training']))
         current=config_dict(self.ec,self.tc)
         # Permit extending a run or moving it between devices; every semantic
         # hyperparameter and scenario assumption must otherwise remain identical.
@@ -202,7 +202,7 @@ class Trainer:
             candidate=Path(resume).resolve().with_name('best.pt')
             if candidate.is_file():
                 best=torch.load(candidate,map_location='cpu',weights_only=True)
-                saved=copy.deepcopy(best.get('configuration',{}))
+                saved=config_dict(EnvConfig(**best['configuration']['environment']),TrainConfig(**best['configuration']['training']))
                 current=config_dict(self.ec,self.tc)
                 for cfg in (saved,current):
                     for key in ('total_steps','device'):

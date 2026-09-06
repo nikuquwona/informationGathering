@@ -9,6 +9,7 @@ def greedy_action(env):
     mu,var=env.belief.predict()
     # Fixed observation-only UCB heuristic, not a tuned competitor or an oracle.
     score=mu+.5*np.sqrt(var)
+    score=np.where(env.flight_mask.ravel(),score,-np.inf)
     goals=[]
     for i in range(c.agents):
         current=score.copy()
@@ -29,10 +30,12 @@ def episode(trainer, seed, policy='trained', trace=False):
     rows=[]
     frames=[]
     total_reward=0.
+    waypoints=None
     def record(info=None,actions=None):
         mu,var=env.belief.predict()
         return dict(step=env.steps,positions=env.positions.tolist(),users=env.users.tolist(),
                     measurements=env.measurements.tolist(),distance=env.distance.tolist(),
+                    bounds=env.bounds.tolist(),scenario_metadata=env.scenario_metadata,
                     mean=mu.reshape(env.config.grid_size,env.config.grid_size).tolist(),
                     std=np.sqrt(var).reshape(env.config.grid_size,env.config.grid_size).tolist(),
                     reward=info,actions=actions.tolist() if actions is not None else None,metrics=env.metrics())
@@ -45,6 +48,14 @@ def episode(trainer, seed, policy='trained', trace=False):
             action=rng.uniform(-1,1,(env.config.agents,2))
         elif policy=='greedy':
             action=greedy_action(env)
+        elif policy=='waypoint':
+            if waypoints is None:waypoints=rng.uniform(env.bounds[0],env.bounds[1],(env.config.agents,2))
+            arrived=np.linalg.norm(waypoints-env.positions,axis=1)<env.config.max_speed*env.config.dt
+            waypoints[arrived]=rng.uniform(env.bounds[0],env.bounds[1],(int(arrived.sum()),2))
+            delta=waypoints-env.positions
+            angle=np.arctan2(delta[:,1],delta[:,0])%(2*np.pi)
+            speed=np.minimum(np.linalg.norm(delta,axis=1)/(env.config.max_speed*env.config.dt),1)
+            action=np.column_stack((angle/np.pi-1,2*speed-1))
         elif policy=='straight':
             # Geometry-only diagnostic: every agent starts on the western edge.
             # Fly east at half maximum speed, stopping exactly at the boundary.
@@ -90,11 +101,12 @@ def evaluate(trainer, count, seed, policy='trained'):
 
 
 def compare(trainer, count, seed):
-    results={policy:evaluate(trainer,count,seed,policy) for policy in ('trained','random','greedy','straight','stationary')}
+    baselines=('random','greedy','waypoint' if trainer.ec.scenario=='generalized' else 'straight','stationary')
+    results={policy:evaluate(trainer,count,seed,policy) for policy in ('trained',*baselines)}
     # Paired scene differences, not confidence intervals over training seeds.
     trained=results['trained']['episodes']
     differences={}
-    for policy in ('random','greedy','straight','stationary'):
+    for policy in baselines:
         differences[policy]={metric:[a[metric]-b[metric] for a,b in zip(trained,results[policy]['episodes'])]
                              for metric in ('mean_coverage','mean_throughput_bps','horizon_coverage','horizon_throughput_bps')}
     return dict(results=results,paired_differences=differences,

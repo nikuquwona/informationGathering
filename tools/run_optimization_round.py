@@ -35,20 +35,30 @@ def main():
     config = ROOT / f'configs/optimization/{label}.json'
     record = ROOT / f'docs/experiments/ten-rounds/{label}'
     record.mkdir(parents=True, exist_ok=True)
-    output = ROOT / f'output/optimization/{label}'
+    output = ROOT / f'output/generalization/{label}'
     output.mkdir(parents=True, exist_ok=True)
     source = source_metadata()
     if source['dirty']:
         raise RuntimeError('Commit round configuration/code before running')
     trials = []
     start = time.time()
-    for seed in (7, 17, 27):
-        destination = output / f'seed{seed}'
-        print(f'{label}: seed {seed} training started', flush=True)
-        with (output / f'seed{seed}-stdout.jsonl').open('w') as log:
-            subprocess.run([sys.executable, '-m', 'localgp.train', '--config', str(config),
-                            '--seed', str(seed), '--output', str(destination)], cwd=ROOT,
-                           stdout=log, check=True)
+    # Independent seed processes overlap CPU environment work; MPS is explicit
+    # in every manifest. No tracked artifacts are written until all runs finish.
+    workers=[]
+    for seed in (7,17,27):
+        destination=output/f'seed{seed}'
+        log=(output/f'seed{seed}-stdout.jsonl').open('w')
+        command=[sys.executable,'-m','localgp.train','--config',str(config),
+                 '--seed',str(seed),'--output',str(destination)]
+        workers.append((seed,subprocess.Popen(command,cwd=ROOT,stdout=log),log))
+        print(f'{label}: seed {seed} training started',flush=True)
+    failures=[]
+    for seed,worker,log in workers:
+        code=worker.wait();log.close()
+        if code:failures.append((seed,code))
+    if failures:raise RuntimeError(f'Training failed: {failures}')
+    for seed in (7,17,27):
+        destination=output/f'seed{seed}'
         logs = [json.loads(line) for line in (destination/'metrics.jsonl').read_text().splitlines()]
         assert logs[-1]['steps'] == 32768
         assert all(np.isfinite([r[k] for k in ('policy_loss','value_loss','entropy','approx_kl','grad_norm')]).all() for r in logs)
@@ -62,9 +72,6 @@ def main():
                           evaluation_source=source, evaluation_device=str(trainer.device))
             atomic_json(destination/f'tuning-{kind}.json', result)
             evaluations[kind] = result
-        # All update rows and completed training episodes are versioned losslessly.
-        with gzip.open(record/f'seed{seed}-metrics.jsonl.gz','wb') as target:
-            target.write((destination/'metrics.jsonl').read_bytes())
         manifest = json.loads((destination/'manifest.json').read_text())
         assert manifest['source']['commit'] == source['commit'] and not manifest['source']['dirty']
         trials.append(dict(seed=seed, manifest=manifest, evaluations=evaluations,
@@ -77,6 +84,9 @@ def main():
         for metric in ('horizon_throughput_bps','horizon_coverage','collisions','delivered_megabits'):
             a = np.array([t['evaluations'][kind]['results']['trained']['summary'][metric]['mean'] for t in trials])
             aggregate[kind][metric] = dict(mean=float(a.mean()), std_training_seeds=float(a.std(ddof=1)), seed_means=a.tolist())
+    for seed in (7,17,27):
+        with gzip.open(record/f'seed{seed}-metrics.jsonl.gz','wb') as target:
+            target.write((output/f'seed{seed}'/'metrics.jsonl').read_bytes())
     atomic_json(record/'results.json',dict(round=args.round,source=source,config=json.loads(config.read_text()),
                  tuning_seeds=list(range(410000,410008)),elapsed_seconds=time.time()-start,trials=trials,aggregate=aggregate))
     print(json.dumps(dict(round=args.round,aggregate=aggregate),ensure_ascii=False),flush=True)

@@ -1,0 +1,25 @@
+{
+  "environment": {
+    "agents": 3,
+    "users": 50,
+    "grid_size": 24,
+    "horizon": 64,
+    "gp_axis": 3,
+    "gp_max_samples": 48,
+    "reward": "balanced",
+    "scenario": "generalized",
+    "map_family": "standard",
+    "min_altitude": 5
+  },
+  "training": {
+    "seed": 7,
+    "device": "mps",
+    "total_steps": 32768,
+    "rollout_steps": 64,
+    "epochs": 4,
+    "minibatch_size": 96,
+    "eval_every": 16,
+    "eval_episodes": 4,
+    "cpu_threads": 1
+  }
+}

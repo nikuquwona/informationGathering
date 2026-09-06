@@ -5,9 +5,10 @@ import numpy as np
 from .config import EnvConfig
 from .gp import LocalBelief
 from .radio import channel_gain, service_metrics
+from .scenarios import generate, inside
 
 
-def resolve_motion(positions, deltas, area_size, min_separation):
+def resolve_motion(positions, deltas, area_size, min_separation, bounds=None):
     """Reject unsafe moves until all simultaneous straight paths are separated.
 
     Once a move is rejected, that agent is stationary; recheck everyone against
@@ -15,7 +16,8 @@ def resolve_motion(positions, deltas, area_size, min_separation):
     """
     positions, deltas = np.asarray(positions, float), np.asarray(deltas, float)
     goals = positions + deltas
-    rejected = np.any((goals < 0) | (goals > area_size), axis=1)
+    bounds=np.array([[0,0],[area_size,area_size]]) if bounds is None else np.asarray(bounds)
+    rejected = ~inside(goals,bounds)
     for _ in range(len(positions) + 1):
         moves = deltas.copy()
         moves[rejected] = 0
@@ -56,6 +58,11 @@ class DeploymentEnv:
         labels = self.rng.integers(c.clusters, size=c.users)
         self.users = np.clip(centers[labels] + self.rng.normal(0, c.area_size * .07, (c.users, 2)), 0, c.area_size)
         self.positions = np.column_stack((np.full(c.agents, c.area_size * .12), np.linspace(.15, .85, c.agents) * c.area_size))
+        self.bounds = np.array([[0.,0.],[c.area_size,c.area_size]])
+        self.scenario_metadata = {}
+        if c.scenario == "generalized":
+            self.bounds,self.positions,self.users,self.scenario_metadata = generate(self.rng,c)
+        self.flight_mask=inside(self.query,self.bounds).reshape(c.grid_size,c.grid_size)
         self.distance = np.zeros(c.agents)
         self.collisions = 0
         self.belief = LocalBelief(c, self.query)
@@ -78,7 +85,10 @@ class DeploymentEnv:
         for i in range(c.agents):
             others = np.delete(coords - coords[i], i, axis=0).reshape(-1)
             context.append(np.r_[coords[i], 1-self.distance[i]/c.distance_budget, sensor[i], 1-self.steps/c.horizon, others])
-        return dict(maps=np.repeat(shared[None], c.agents, axis=0), context=np.asarray(context, np.float32))
+        context=np.asarray(context,np.float32)
+        if c.scenario=="generalized":
+            context=np.concatenate((context,np.repeat((self.bounds.reshape(-1)/c.area_size)[None],c.agents,axis=0)),axis=1).astype(np.float32)
+        return dict(maps=np.repeat(shared[None], c.agents, axis=0), context=context)
 
     def central_state(self):
         c = self.config
@@ -86,6 +96,7 @@ class DeploymentEnv:
         truth = self.encode_signal(c.mu_power * channel_gain(self.query, self.users, c).sum(axis=1)).reshape(c.grid_size, c.grid_size)
         maps = np.concatenate((actor['maps'][0], truth[None]), axis=0).astype(np.float32)
         global_context = np.r_[self.positions.reshape(-1)/c.area_size, 1-self.distance/c.distance_budget, self.steps/c.horizon]
+        if c.scenario=="generalized":global_context=np.r_[global_context,self.bounds.reshape(-1)/c.area_size]
         contexts = [np.r_[global_context, np.eye(c.agents)[i]] for i in range(c.agents)]
         return dict(maps=np.repeat(maps[None], c.agents, axis=0), context=np.asarray(contexts, np.float32))
 
@@ -101,23 +112,24 @@ class DeploymentEnv:
         length = np.minimum((actions[:, 1]+1)*.5*c.max_speed*c.dt, c.distance_budget-self.distance)
         deltas = np.column_stack((np.cos(heading), np.sin(heading))) * length[:, None]
         previous = self.positions.copy()
-        self.positions, rejected = resolve_motion(previous, deltas, c.area_size, c.min_separation)
+        self.positions, rejected = resolve_motion(previous, deltas, c.area_size, c.min_separation, self.bounds)
         travelled = np.linalg.norm(self.positions-previous, axis=1)
         self.distance += travelled
         self.collisions += int(rejected.sum())
         self.steps += 1
         # Reflect rather than accumulate/clamp users at boundaries.
         moved = self.users + self.rng.normal(0, c.user_speed_std*c.dt, self.users.shape)
-        folded = np.mod(moved, 2*c.area_size)
-        self.users = np.minimum(folded, 2*c.area_size-folded)
+        span=self.bounds[1]-self.bounds[0]
+        folded = np.mod(moved-self.bounds[0], 2*span)
+        self.users = self.bounds[0]+np.minimum(folded, 2*span-folded)
         self.belief.age(self.steps)
         before_mu, before_var = self.belief.predict()
         self.measurements = self._measure()
         self.belief.update(self.positions, self.encode_signal(self.measurements), self.steps)
         after_mu, after_var = self.belief.predict()
         # Average avoids rewarding a denser numerical grid for the same scene.
-        information = float(np.maximum(0, np.log(before_var)-np.log(after_var)).mean())
-        mean_change = float(np.abs(after_mu-before_mu).mean())
+        information = float(np.maximum(0, np.log(before_var)-np.log(after_var))[self.flight_mask.ravel()].mean())
+        mean_change = float(np.abs(after_mu-before_mu)[self.flight_mask.ravel()].mean())
         sensed = self.encode_signal(self.measurements)
         distances = np.linalg.norm(self.positions[:, None]-self.positions[None, :], axis=-1)
         redundancy = np.exp(-.5*(distances/c.gp_length_scale)**2).sum(axis=1)
@@ -146,15 +158,19 @@ class DeploymentEnv:
     def state_dict(self):
         return dict(config=asdict(self.config), rng=copy.deepcopy(self.rng.bit_generator.state),
                     steps=self.steps, ended=self.ended, collisions=self.collisions,
+                    bounds=self.bounds.tolist(),scenario_metadata=self.scenario_metadata,
                     positions=self.positions.tolist(), users=self.users.tolist(),
                     distance=self.distance.tolist(), measurements=self.measurements.tolist(), belief=self.belief.state_dict())
 
     def load_state_dict(self, state):
-        if state['config'] != asdict(self.config):
+        if asdict(EnvConfig(**state['config'])) != asdict(self.config):
             raise ValueError('Environment configuration differs from checkpoint')
         self.rng.bit_generator.state = copy.deepcopy(state['rng'])
         for name in ('steps','ended','collisions'):
             setattr(self, name, state[name])
         for name in ('positions','users','distance','measurements'):
             setattr(self, name, np.asarray(state[name], dtype=float))
+        self.bounds=np.asarray(state.get('bounds',[[0.,0.],[self.config.area_size,self.config.area_size]]),dtype=float)
+        self.flight_mask=inside(self.query,self.bounds).reshape(self.config.grid_size,self.config.grid_size)
+        self.scenario_metadata=copy.deepcopy(state.get('scenario_metadata',{}))
         self.belief.load_state_dict(state['belief'])
