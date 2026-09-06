@@ -1,6 +1,5 @@
 import sys
 
-import torch
 from forth.GPmodel import GlobalGaussianProcessCoordinator, LocalGaussianProcessCoordinator
 
 # from forth.groundtruth import GroundTruth
@@ -15,7 +14,10 @@ import numpy as np
 # from Environment.GroundTruthsModels.NewFireFront import WildFiresSimulator
 # from GPModel.GPmodel import LocalGaussianProcessCoordinator, GlobalGaussianProcessCoordinator
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C, WhiteKernel as W
-import gym
+try:
+	import gymnasium as gym
+except ImportError:
+	import gym
 from scipy.spatial import distance_matrix
 # from Environment.Wrappers.time_stacking_wrapper import MultiAgentTimeStackingMemory
 import matplotlib.pyplot as plt
@@ -542,14 +544,8 @@ class MultiagentInformationGathering:
 			# adjustment = mu_map - np.min(mu_map)
 			# mu_map_clipped = adjustment / np.max(adjustment)
 			# mu_map = mu_map - np.min(mu_map)/ np.max(adjustment)
-			hotcode = np.zeros((100, 100))
+			hotcode = np.full(self.scenario_map.shape, i / max(1, self.number_of_agents - 1), dtype=np.float32)
 
-			if i == 0:
-				hotcode = np.zeros((100, 100))
-			elif i == 1:
-				hotcode = np.full((100, 100), 0.5)
-			elif i == 2:
-				hotcode = np.ones((100, 100))
 			# print("shape",hotcode.shape)
 			# print("shape",mu_map.shape)
 			state[i] = np.concatenate((
@@ -561,7 +557,7 @@ class MultiagentInformationGathering:
 				agent_observation_of_position[np.newaxis],
 				self.scenario_map[np.newaxis].copy(),
 				hotcode[np.newaxis],	
-			))
+			)).astype(np.float32)
 
 		self.state = state
 

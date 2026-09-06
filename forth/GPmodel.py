@@ -8,6 +8,28 @@ import multiprocessing as mp
 import time
 
 
+def _samples(x, y):
+    """Normalize one scalar observation per 2D position, including empty batches."""
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float).reshape(-1, 1)
+    if x.size == 0:
+        x = np.empty((0, 2), dtype=float)
+    else:
+        x = np.atleast_2d(x)
+    if x.ndim != 2 or x.shape[1] != 2 or len(x) != len(y):
+        raise ValueError("Expected positions (N, 2) and one measurement per position")
+    if not np.isfinite(x).all() or not np.isfinite(y).all():
+        raise ValueError("Positions and measurements must be finite")
+    return x, y
+
+
+def _latest_samples(x, y):
+    """Keep the most recent reading at each location in a changing signal field."""
+    _, reverse_index = np.unique(x[::-1], axis=0, return_index=True)
+    index = np.sort(len(x) - 1 - reverse_index)
+    return x[index], y[index]
+
+
 class BaseLocalGaussianProcess:
 	
 	""" Local Gaussian Process Regression Model """
@@ -30,12 +52,12 @@ class BaseLocalGaussianProcess:
 		self.local_index = local_index
 
 		self.local_mu = np.zeros(self.local_X.shape[0])
-		self.local_sigma = np.ones(self.local_X.shape[0])
+		self.local_sigma = np.sqrt(self.kernel.diag(self.local_X))
 
 		self.distance_threshold = distance_threshold
 		
 		self.global_mu_map = np.zeros(self.global_X.shape[0])
-		self.global_sigma_map = np.zeros(self.global_X.shape[0])
+		self.global_sigma_map = np.sqrt(self.kernel.diag(self.global_X))
 
 		self.change_mu = 0
 		self.change_sigma = 0
@@ -45,6 +67,8 @@ class BaseLocalGaussianProcess:
 
 		# Get the index of the new data that is far away from the local GP model #
 		# The distance is computed using the L2 norm #
+		x, y = _samples(x, y)
+		self.change_mu = self.change_sigma = 0.0
 		distance = np.linalg.norm(x - self.position, axis=1)
 		index = np.where(distance <= self.distance_threshold)[0]
 		#一堆位置
@@ -65,8 +89,7 @@ class BaseLocalGaussianProcess:
 			self.y = np.vstack((self.y, y))
 
 		# Erase the repeated data #
-		self.x, unique_index = np.unique(self.x, axis=0, return_index=True)
-		self.y = self.y[unique_index]
+		self.x, self.y = _latest_samples(self.x, self.y)
 		
 		# Fit the new data #
 		# If the model has been trained, then use the length scale of the previous model #
@@ -96,9 +119,10 @@ class BaseLocalGaussianProcess:
 		self.x = None
 		self.y = None
 		self.local_mu = np.zeros_like(self.local_mu)
-		self.local_sigma = np.ones_like(self.local_sigma)
+		self.local_sigma = np.sqrt(self.kernel.diag(self.local_X))
 		self.global_mu_map = np.zeros_like(self.global_mu_map)
-		self.global_sigma_map = np.ones_like(self.global_sigma_map)
+		self.global_sigma_map = np.sqrt(self.kernel.diag(self.global_X))
+		self.gp = GaussianProcessRegressor(kernel=self.kernel, alpha=self.alpha, n_restarts_optimizer=self.n_restarts_optimizer, normalize_y=False)
 		self.change_mu = 0
 		self.change_sigma = 0
 
@@ -112,7 +136,11 @@ class LocalGaussianProcessCoordinator:
 	
 	def __init__(self, gp_positions: np.ndarray, scenario_map:np.ndarray, kernel, alpha=1e-10, n_restarts_optimizer=0, distance_threshold=10):
 		
-		self.gp_positions = gp_positions
+		self.gp_positions = np.asarray(gp_positions, dtype=float)
+		if self.gp_positions.ndim != 2 or self.gp_positions.shape[1] != 2 or len(self.gp_positions) == 0 or not np.isfinite(self.gp_positions).all():
+			raise ValueError("At least one finite GP position (K, 2) is required")
+		if not np.isfinite(distance_threshold) or distance_threshold <= 0:
+			raise ValueError("distance_threshold must be positive and finite")
 
 		# Select those positions of scenario map that are 1 using numpy #
 		self.X = np.asarray(np.where(scenario_map == 1)).T
@@ -122,8 +150,8 @@ class LocalGaussianProcessCoordinator:
 		self.x = None
 		self.scenario_map = scenario_map
 		self.distance_threshold  = distance_threshold # 半径
-		self.mu_map = np.zeros_like(self.scenario_map)
-		self.sigma_map = np.ones_like(self.scenario_map)
+		self.mu_map = np.zeros_like(self.scenario_map, dtype=float)
+		self.sigma_map = np.ones_like(self.scenario_map, dtype=float)
 
 		""" Create N local GP models """
 		self.gp_models = [BaseLocalGaussianProcess(position, self.X, self.compute_local_index(self.X, position), self.distance_threshold, kernel, alpha, n_restarts_optimizer) for position in gp_positions]
@@ -137,16 +165,25 @@ class LocalGaussianProcessCoordinator:
 		#self.distance_matrix_for_points[self.distance_matrix_for_points > self.distance_threshold] = np.inf
 
 		# Compute the weight matrix - The size is (number_of_points, number_of_GP_models) #
-		exp_distance_matrix_for_points = np.exp(-self.distance_matrix_for_points)
-		sum_distance_matrix = np.sum(exp_distance_matrix_for_points, axis=1)
-		self.weight = exp_distance_matrix_for_points / (sum_distance_matrix[:, None] + 1e-6)
-		self.weight = self.weight.T
+		# Only blend experts that actually predict at a point. Subtract the
+		# nearest distance before exponentiating to avoid underflow.
+		support = np.asarray([gp.local_index for gp in self.gp_models]).T
+		log_weight = np.where(support, -self.distance_matrix_for_points, -np.inf)
+		self.covered = support.any(axis=1)
+		nearest = np.max(log_weight, axis=1, keepdims=True)
+		nearest[~self.covered] = 0.0
+		weights = np.exp(log_weight - nearest)
+		total = weights.sum(axis=1, keepdims=True)
+		self.weight = np.divide(weights, total, out=np.zeros_like(weights), where=total > 0).T
+		self.prior_sigma = np.sqrt(kernel.diag(self.X))
+		self.sigma_map[self.X[:, 0], self.X[:, 1]] = self.prior_sigma
+
 		# MxN
   
 		# To store the changes of the local GP models #
 		self.changes = np.zeros(len(self.gp_models))
-		self.changes_mu_map = np.zeros_like(self.scenario_map)
-		self.changes_sigma_map = np.zeros_like(self.scenario_map)
+		self.changes_mu_map = np.zeros_like(self.scenario_map, dtype=float)
+		self.changes_sigma_map = np.zeros_like(self.scenario_map, dtype=float)
 
 	def compute_local_index(self, X: np.ndarray, position:np.ndarray):
 		""" Compute the local positions X_local from the all positions X and the local GP model position """
@@ -178,6 +215,7 @@ class LocalGaussianProcessCoordinator:
 			fussed_mu += self.weight[index] * gp_model.global_mu_map # 附加一个权重，离得越近，权重越高
 			fussed_std += self.weight[index] * gp_model.global_sigma_map
 		#把所有高斯模型的mu std都加起来
+		fussed_std[~self.covered] = self.prior_sigma[~self.covered]
 		self.mu_map[self.X[:, 0], self.X[:, 1]] = fussed_mu
 
 		self.sigma_map[self.X[:, 0], self.X[:, 1]] = fussed_std
@@ -187,8 +225,7 @@ class LocalGaussianProcessCoordinator:
 	def update(self, x, y):
 		""" Update the local GP models with the new data that is nearest to the local GP model """
 		
-		x = np.atleast_2d(x)
-		y = np.atleast_2d(y)
+		x, y = _samples(x, y)
 	
 		# Update the local GP models in parallel using joblib #
 		#Parallel(n_jobs=16, require='sharedmem')(delayed(gp_model.update)(x, y) for gp_model in self.gp_models)
@@ -220,9 +257,13 @@ class LocalGaussianProcessCoordinator:
 		
 		self.x = None
 		self.y = None
-		self.mu_map = np.zeros_like(self.scenario_map)
-		self.sigma_map = np.ones_like(self.scenario_map)
+		self.mu_map = np.zeros_like(self.scenario_map, dtype=float)
+		self.sigma_map = np.ones_like(self.scenario_map, dtype=float)
 		
+		self.sigma_map[self.X[:, 0], self.X[:, 1]] = self.prior_sigma
+		self.changes_mu_map.fill(0)
+		self.changes_sigma_map.fill(0)
+		self.changes.fill(0)
 		for gp_model in self.gp_models:
 			gp_model.reset()
 
@@ -286,13 +327,15 @@ class GlobalGaussianProcessCoordinator:
 		self.x = None
 		self.scenario_map = scenario_map
 		self.distance_threshold  = distance_threshold
-		self.mu_map = np.zeros_like(self.scenario_map)
-		self.sigma_map = np.ones_like(self.scenario_map)
+		self.mu_map = np.zeros_like(self.scenario_map, dtype=float)
+		self.sigma_map = np.ones_like(self.scenario_map, dtype=float)
   
-		self.changes_mu_map = np.zeros_like(self.scenario_map)
-		self.changes_sigma_map = np.zeros_like(self.scenario_map)
+		self.changes_mu_map = np.zeros_like(self.scenario_map, dtype=float)
+		self.changes_sigma_map = np.zeros_like(self.scenario_map, dtype=float)
 		# To store the changes of the local GP models #
 		self.changes = 0
+		self.mu, self.sigma = self.generate_nearest_map()
+		self.sigma_map[self.X[:, 0], self.X[:, 1]] = self.sigma
 			
 	@staticmethod
 	def get_distance(position1, position2):
@@ -303,24 +346,14 @@ class GlobalGaussianProcessCoordinator:
 		return 0
 	
 	def generate_nearest_map(self):
-		""" Generate a map to show the points that are nearest to the local GP models """
-		
-		nearest_map_sigma = np.zeros((self.X.shape[0],))
-		nearest_map_mu = np.zeros((self.X.shape[0],))
-		
-		# For every position in X, find the nearest GP model, take the mu in this position and assing to this mu value to nearest_map #
-		for i in range(len(nearest_map_mu)):
-			nearest_gp_index = self.get_nearest_gp_index(self.X[i])
-			nearest_map_sigma[i] = self.gp_models[nearest_gp_index].sigma[i]
-			nearest_map_mu[i] = self.gp_models[nearest_gp_index].sigma[i]
-			
-		return self.gp_models.mu, self.gp_models.sigma
+		"""Return the single global expert's mean and standard deviation."""
+		return self.gp_models.global_mu_map.copy(), self.gp_models.global_sigma_map.copy()
 	
+
 	def update(self, x, y):
 		""" Update the local GP models with the new data that is nearest to the local GP model """
 		
-		x = np.atleast_2d(x)
-		y = np.atleast_2d(y)
+		x, y = _samples(x, y)
 
 		old_mu = self.gp_models.global_mu_map.copy()
 		self.gp_models.update(x, y)
@@ -335,12 +368,11 @@ class GlobalGaussianProcessCoordinator:
 			self.y = np.vstack((self.y, y))
 			
 		# Erase the repeated data #
-		self.x, unique_index = np.unique(self.x, axis=0, return_index=True)
-		self.y = self.y[unique_index]
+		self.x, self.y = _latest_samples(self.x, self.y)
 		
 		# Compose the mu using the local GP models mu weighted by the uncertainty #
 		self.mu = self.gp_models.global_mu_map
-		self.sigma = self.gp_models.global_mu_map
+		self.sigma = self.gp_models.global_sigma_map
 		
 		
 		
@@ -364,10 +396,15 @@ class GlobalGaussianProcessCoordinator:
 		
 		self.x = None
 		self.y = None
-		self.mu_map = np.zeros_like(self.scenario_map)
-		self.sigma_map = np.ones_like(self.scenario_map)
+		self.mu_map = np.zeros_like(self.scenario_map, dtype=float)
+		self.sigma_map = np.ones_like(self.scenario_map, dtype=float)
 		
 		self.gp_models.reset()
+		self.mu, self.sigma = self.generate_nearest_map()
+		self.sigma_map[self.X[:, 0], self.X[:, 1]] = self.sigma
+		self.changes_mu_map.fill(0)
+		self.changes_sigma_map.fill(0)
+		self.changes = 0.0
 
 	def get_local_gp_index(self, position):
 		""" Return the index of the local GP model that is nearest to the position """
