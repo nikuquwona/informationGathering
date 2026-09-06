@@ -13,3 +13,7 @@ The exact local scientific/test dependencies are captured in `requirements-verif
 ## New MPS pipeline validation
 
 The final new pipeline passed 64 tests on the actual MPS-capable host, including forward/backward, PPO updates, checkpoint restore, CPU bit-exact continuation, resumed best-checkpoint handling, and common-horizon service accounting, and geometry-only baseline behavior. Three training seeds completed 16,384 steps each. The full Chinese experiment record and limitations are in [mps-2026-09-06.md](experiments/mps-2026-09-06.md). Both the historical viewer and new actual-episode viewer passed browser interaction and responsive-layout checks. Remote CI remains configured but has not been run from this local branch.
+
+## Fixed-window ten-round study
+
+The final suite passed **74 tests** on the MPS-capable host, with no MPS skips, including four-channel local-belief forward/backward and checkpoint restoration. Thirty complete runs total 983,040 environment steps. Full log SHA-256, clean-source manifests, matching world RNG end states per seed, and paired map-only baselines are audited by `tools/audit_completed_study.py`. Read the [Chinese study report](experiments/ten-rounds/README.md) for actual outcomes and limitations; completion is not a convergence or superiority claim. Remote CI has not been run from this local branch.

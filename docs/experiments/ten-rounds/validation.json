@@ -1,0 +1,31 @@
+{
+  "rounds": 10,
+  "training_runs": 30,
+  "training_steps": 983040,
+  "training_episodes": 15360,
+  "all_mps": true,
+  "all_clean_training_source": true,
+  "full_logs_sha256": "verified",
+  "training_world_rng": "matched per seed across all rounds",
+  "map_only_baseline_pairing": "identical service across rounds",
+  "final_test_suites": "verified",
+  "pytest": {
+    "passed": 74,
+    "warnings": 27,
+    "mps_skips": 0
+  },
+  "browser": {
+    "standard": "passed",
+    "elongated": "passed",
+    "checks": [
+      "playback",
+      "mean/std layers",
+      "truth toggle",
+      "policy switch",
+      "fixed-window description",
+      "390px overflow",
+      "page exceptions"
+    ]
+  },
+  "audit_tool": "tools/audit_completed_study.py"
+}

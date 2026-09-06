@@ -8,6 +8,22 @@
 
 [本机三种子实验结果与复现记录](docs/experiments/mps-2026-09-06.md)：MPS 共完成 49,152 个环境步，64 项测试通过。固定向右半速基线强于本轮训练策略，尚未证明 GP 的额外收益；报告保留这一诊断与后续改进方向。
 
+## 最新：十轮随机场景实验
+
+[十轮中文报告与折线图](docs/experiments/ten-rounds/README.md)记录了 30 次 MPS 训练、983,040 环境步，以及全部改动、成功或失败结果、完整日志和独立测试。最终回归 74 项通过。
+
+本轮任务随机化矩形地图、UAV 起点和聚类人群分布，只保留地图边界、最低高度和机间防碰撞。固定合法高度，每回合完整 64 秒；不含障碍物或航程预算。Actor 不读取用户真值。
+
+第 5 轮由调参验证集选出，复现入口如下；这是实验选出的版本，不代表已经证明任意未知环境下都有效：
+
+```sh
+python -m localgp.train --config configs/optimization/r05.json --seed 7 --output output/new-study-seed7
+python -m localgp.evaluate output/new-study-seed7/best.pt --device mps --episodes 8 --seed 710000 --output output/new-study-evaluation
+python tools/build_training_report.py output/new-study-evaluation
+```
+
+`configs/optimization/r01.json` 到 `r10.json` 保留全部轮次配置。已有实验目录受保护，不会静默覆盖。下面的 `configs/mac.json` 仍是旧固定布局兼容入口；不要将它的结果与新任务直接拼接。
+
 ## 在 Mac 上训练
 
 Python 3.10 或更新版本。以下命令均在仓库根目录执行：
