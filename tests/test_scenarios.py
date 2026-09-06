@@ -67,3 +67,13 @@ def test_generalized_training_update_and_restore(tmp_path):
         restored=Trainer(trainer.ec,trainer.tc);restored.restore(tmp_path/'model.pt')
         a,_=trainer.collect();b,_=restored.collect()
         for key in a:np.testing.assert_array_equal(a[key],b[key])
+
+
+def test_fixed_window_has_no_flight_budget_and_zero_terminal_bootstrap():
+    env=DeploymentEnv(config(enforce_distance_budget=False,finite_horizon=True,distance_budget=.01,horizon=3),7)
+    for step in range(3):
+        _,_,terminated,truncated,_=env.step(np.zeros((3,2)))
+        assert terminated==(step==2)
+        assert not truncated
+    assert env.distance.sum()>.01
+    np.testing.assert_array_equal(env.observe()['context'][:,2],1.)

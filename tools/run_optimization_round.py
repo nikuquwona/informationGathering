@@ -35,7 +35,7 @@ def main():
     config = ROOT / f'configs/optimization/{label}.json'
     record = ROOT / f'docs/experiments/ten-rounds/{label}'
     record.mkdir(parents=True, exist_ok=True)
-    output = ROOT / f'output/generalization/{label}'
+    output = ROOT / f'output/fixed-window/{label}'
     output.mkdir(parents=True, exist_ok=True)
     source = source_metadata()
     if source['dirty']:

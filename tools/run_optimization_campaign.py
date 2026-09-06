@@ -12,6 +12,7 @@ def git(*args):subprocess.run(['git',*args],cwd=ROOT,check=True)
 
 def main():
     candidates=[
+      (2,'training','separate_grad_clip',True,'分开裁剪策略与价值网络梯度','两个独立网络共用范数上限会产生优化耦合，单独裁剪检验价值误差是否妨碍策略更新；不改变信息、网络或奖励。'),
       (3,'training','rollout_steps',256,'增加每次更新的新轨迹批量','每次更新收集四倍连续数据，减小单回合梯度噪声；eval_every 同步改为 4，保持每 1024 步评估，训练总步数、每样本优化次数不变。'),
       (4,'training','gae_lambda',.98,'延长优势递推的有效范围','提高 GAE 的 lambda，让延迟的感知收益传播得更远；代价是优势估计方差可能增加。'),
       (5,'training','entropy_coef',.003,'减小熵正则强度','随机探索可能妨碍稳定部署，降低熵系数检验探索与利用的权衡；不预设方向或目的地。'),

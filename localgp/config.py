@@ -37,6 +37,8 @@ class EnvConfig:
     gp_axis: int = 3
     gp_max_samples: int = 48
     gp_max_age: int = 64
+    enforce_distance_budget: bool = True
+    finite_horizon: bool = False
     scenario: str = 'legacy'
     map_family: str = 'standard'
     reward: str = 'balanced'
@@ -56,10 +58,12 @@ class EnvConfig:
         nonnegative = {'user_speed_std', 'measurement_noise', 'nlos_extra_db', 'signal_weight', 'information_weight', 'movement_weight', 'collision_weight'}
         for field in fields(self):
             value = getattr(self, field.name)
-            if field.name not in integer_names and field.name not in ('reward','scenario','map_family') and (type(value) not in (int, float) or not math.isfinite(value) or value < 0 or (value == 0 and field.name not in nonnegative)):
+            if field.name not in integer_names and field.name not in ('reward','scenario','map_family','enforce_distance_budget','finite_horizon') and (type(value) not in (int, float) or not math.isfinite(value) or value < 0 or (value == 0 and field.name not in nonnegative)):
                 raise ValueError(f'{field.name} must be finite and positive (or a permitted zero)')
         if self.min_separation * (self.agents - 1) >= self.area_size * 0.7:
             raise ValueError('Initial fleet cannot fit with the requested separation')
+        if type(self.enforce_distance_budget) is not bool or type(self.finite_horizon) is not bool:
+            raise ValueError('Task switches must be boolean')
         if self.altitude < self.min_altitude:
             raise ValueError('altitude must be at least min_altitude')
         if self.scenario not in ('legacy','generalized') or self.map_family not in ('standard','elongated'):

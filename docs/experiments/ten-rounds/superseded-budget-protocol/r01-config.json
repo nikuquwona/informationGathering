@@ -9,9 +9,7 @@
     "reward": "balanced",
     "scenario": "generalized",
     "map_family": "standard",
-    "min_altitude": 5,
-    "enforce_distance_budget": false,
-    "finite_horizon": true
+    "min_altitude": 5
   },
   "training": {
     "seed": 7,

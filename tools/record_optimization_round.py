@@ -12,7 +12,7 @@ def record_round(n):
      e=t['evaluations'];b=e['best'];l=e['last'];cv=[x for x in t['curve'] if 'evaluation' in x];means=[x['evaluation']['horizon_throughput_bps']['mean']/1e6 for x in cv]
      s+=f"- 种子 {t['seed']}：选中 {b['checkpoint_step']} 步；调参验证最佳 {b['results']['trained']['summary']['horizon_throughput_bps']['mean']/1e6:.3f} Mbps，最后 {l['results']['trained']['summary']['horizon_throughput_bps']['mean']/1e6:.3f} Mbps。检查点选择集最初四次／最后四次评估均值 {np.mean(means[:4]):.3f}／{np.mean(means[-4:]):.3f} Mbps。\n"
     b=r['trials'][0]['evaluations']['best']['results'];s+='\n相同验证场景基线：'+ '；'.join(f"{k} {b[k]['summary']['horizon_throughput_bps']['mean']/1e6:.3f} Mbps / {b[k]['summary']['horizon_coverage']['mean']*100:.2f}%" for k in ['waypoint','greedy','random','stationary'])+'。\n'
-    s+=f"\n[完整配置、逐场景结果、逐更新曲线与来源](r{n:02d}/results.json)。全部训练回合及更新日志无损保存在同目录 `seed*-metrics.jsonl.gz`；模型在 `output/generalization/r{n:02d}/seed*/`，最佳与最后检查点的 SHA-256 均在结果文件中。最终留出测试尚未用于此轮决策。\n"
+    s+=f"\n[完整配置、逐场景结果、逐更新曲线与来源](r{n:02d}/results.json)。全部训练回合及更新日志无损保存在同目录 `seed*-metrics.jsonl.gz`；模型在 `output/fixed-window/r{n:02d}/seed*/`，最佳与最后检查点的 SHA-256 均在结果文件中。最终留出测试尚未用于此轮决策。\n"
     p.write_text(s)
     print(json.dumps(r['aggregate'],indent=2))
 
