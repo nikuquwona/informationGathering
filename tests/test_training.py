@@ -155,3 +155,15 @@ def test_geometry_only_baseline_requires_no_belief_for_its_actions():
     np.testing.assert_allclose(final[:,0]-initial[:,0],ec.horizon*ec.dt*ec.max_speed/2)
     np.testing.assert_array_equal(final[:,1],initial[:,1])
     assert result['collisions']==0
+
+
+def test_separate_clipping_prevents_critic_scale_from_suppressing_actor():
+    from localgp.trainer import clip_actor_critic
+    actor=torch.nn.Parameter(torch.zeros(1));critic=torch.nn.Parameter(torch.zeros(1))
+    actor.grad=torch.ones(1);critic.grad=torch.full((1,),1e6)
+    clip_actor_critic([actor],[critic],.5,True)
+    assert actor.grad.item()==pytest.approx(.5,rel=1e-5)
+    assert critic.grad.item()==pytest.approx(.5,rel=1e-5)
+    actor.grad=torch.ones(1);critic.grad=torch.full((1,),1e6)
+    clip_actor_critic([actor],[critic],.5,False)
+    assert actor.grad.item()<1e-5

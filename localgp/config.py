@@ -83,6 +83,7 @@ class TrainConfig:
     entropy_coef: float = 0.01
     value_coef: float = 0.5
     max_grad_norm: float = 0.5
+    separate_grad_clip: bool = False
     target_kl: float = 0.03
     eval_every: int = 16
     eval_episodes: int = 4
@@ -94,6 +95,8 @@ class TrainConfig:
         for name in ('total_steps','rollout_steps','epochs','minibatch_size','eval_every','eval_episodes','hidden_size','cpu_threads'):
             if type(getattr(self, name)) is not int or getattr(self, name) <= 0:
                 raise ValueError(f'{name} must be a positive integer')
+        if type(self.separate_grad_clip) is not bool:
+            raise ValueError('separate_grad_clip must be boolean')
         if self.device not in ('auto', 'cpu', 'mps', 'cuda'):
             raise ValueError('Unknown device')
         if not 0 <= self.gamma <= 1 or not 0 <= self.gae_lambda <= 1:

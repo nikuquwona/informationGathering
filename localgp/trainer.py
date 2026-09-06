@@ -38,6 +38,15 @@ def source_metadata():
                 python=platform.python_version(),torch=str(torch.__version__),numpy=np.__version__,scipy=scipy.__version__,platform=platform.platform())
 
 
+def clip_actor_critic(actor_parameters, critic_parameters, maximum, separate):
+    actor_parameters,critic_parameters=list(actor_parameters),list(critic_parameters)
+    if separate:
+        actor_norm=torch.nn.utils.clip_grad_norm_(actor_parameters,maximum,error_if_nonfinite=True)
+        critic_norm=torch.nn.utils.clip_grad_norm_(critic_parameters,maximum,error_if_nonfinite=True)
+        return torch.hypot(actor_norm,critic_norm)
+    return torch.nn.utils.clip_grad_norm_(actor_parameters+critic_parameters,maximum,error_if_nonfinite=True)
+
+
 class Trainer:
     def __init__(self, environment_config, training_config):
         self.ec, self.tc = environment_config, training_config
@@ -126,7 +135,7 @@ class Trainer:
                     raise FloatingPointError('Non-finite PPO loss')
                 self.optimizer.zero_grad(set_to_none=True)
                 loss.backward()
-                grad_norm=torch.nn.utils.clip_grad_norm_(parameters,c.max_grad_norm,error_if_nonfinite=True)
+                grad_norm=clip_actor_critic(self.actor.parameters(),self.critic.parameters(),c.max_grad_norm,c.separate_grad_clip)
                 self.optimizer.step()
                 metrics.append(dict(policy_loss=policy_loss.item(),value_loss=value_loss.item(),entropy=entropy.item(),
                                     approx_kl=approximate_kl.item(),grad_norm=grad_norm.item(),
