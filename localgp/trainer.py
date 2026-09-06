@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import shutil
 import subprocess
 import time
 
@@ -191,10 +192,31 @@ class Trainer:
         if output.exists() and any(output.iterdir()):
             raise FileExistsError('Use a new output directory; existing experiment evidence is never overwritten')
         output.mkdir(parents=True,exist_ok=True)
+        inherited_best=None
         if resume:
             self.restore(resume)
+            if self.total_steps>=self.tc.total_steps:
+                raise ValueError('Resume target must exceed the checkpoint step count')
+            # A last checkpoint knows the best score, but contains current rather
+            # than best parameters. Preserve a compatible sibling best snapshot.
+            candidate=Path(resume).resolve().with_name('best.pt')
+            if candidate.is_file():
+                best=torch.load(candidate,map_location='cpu',weights_only=True)
+                saved=copy.deepcopy(best.get('configuration',{}))
+                current=config_dict(self.ec,self.tc)
+                for cfg in (saved,current):
+                    for key in ('total_steps','device'):
+                        cfg.get('training',{}).pop(key,None)
+                if saved==current and best.get('total_steps',float('inf'))<=self.total_steps and best.get('best_eval')==self.best_eval:
+                    shutil.copyfile(candidate,output/'best.pt')
+                    inherited_best=dict(path=str(candidate),sha256=hashlib.sha256(candidate.read_bytes()).hexdigest())
+            if inherited_best is None:
+                # Portable last.pt without its sibling: select among this new
+                # segment's evaluations instead of retaining an unattainable score.
+                self.best_eval=-float('inf')
         manifest=dict(configuration=config_dict(self.ec,self.tc),source=source_metadata(),device=str(self.device),
                       started_at=time.strftime('%Y-%m-%dT%H:%M:%S%z'),
+                      inherited_best=inherited_best,best_selection_scope='inherited and current' if inherited_best else 'current segment',
                       resumed_from=str(Path(resume).resolve()) if resume else None,
                       checkpoint_sha256=hashlib.sha256(Path(resume).read_bytes()).hexdigest() if resume else None)
         atomic_json(output/'manifest.json',manifest)

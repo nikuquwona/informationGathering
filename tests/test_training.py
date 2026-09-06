@@ -104,3 +104,30 @@ def test_explicit_mps_request_cannot_silently_fall_back(monkeypatch):
     monkeypatch.setattr(torch.backends.mps,'is_available',lambda:False)
     with pytest.raises(RuntimeError,match='no silent'):
         select_device('mps')
+
+
+def test_resumed_run_preserves_an_unbeaten_best_checkpoint(tmp_path):
+    ec,tc=configs()
+    trainer=Trainer(ec,tc)
+    batch,_=trainer.collect()
+    trainer.update(batch)
+    trainer.best_eval=1e12
+    trainer.checkpoint(tmp_path/'original'/'best.pt')
+    trainer.checkpoint(tmp_path/'original'/'last.pt')
+    restored=Trainer(ec,tc)
+    restored.run(tmp_path/'resumed',tmp_path/'original'/'last.pt')
+    assert (tmp_path/'resumed'/'best.pt').read_bytes()==(tmp_path/'original'/'best.pt').read_bytes()
+    assert (tmp_path/'resumed'/'last.pt').exists()
+
+
+def test_portable_checkpoint_without_best_selects_current_segment(tmp_path):
+    ec,tc=configs()
+    trainer=Trainer(ec,tc)
+    batch,_=trainer.collect()
+    trainer.update(batch)
+    trainer.best_eval=1e12
+    trainer.checkpoint(tmp_path/'portable'/'last.pt')
+    restored=Trainer(ec,tc)
+    restored.run(tmp_path/'resumed',tmp_path/'portable'/'last.pt')
+    assert (tmp_path/'resumed'/'best.pt').exists()
+    assert restored.best_eval<1e12
