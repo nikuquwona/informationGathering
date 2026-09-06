@@ -5,7 +5,7 @@ from pathlib import Path
 import torch
 from threadpoolctl import threadpool_limits
 from .config import EnvConfig,TrainConfig
-from .trainer import Trainer,atomic_json
+from .trainer import Trainer,atomic_json,source_metadata
 from .evaluation import compare,episode
 
 
@@ -22,7 +22,8 @@ def main():
     output=Path(args.output)
     if output.exists():
         parser.error('Output already exists; choose a new experiment directory')
-    cfg=torch.load(args.checkpoint,map_location='cpu',weights_only=True)['configuration']
+    checkpoint=torch.load(args.checkpoint,map_location='cpu',weights_only=True)
+    cfg=checkpoint['configuration']
     trainer=Trainer(EnvConfig(**cfg['environment']),replace(TrainConfig(**cfg['training']),device=args.device))
     trainer.restore(args.checkpoint)
     output.mkdir(parents=True)
@@ -31,6 +32,9 @@ def main():
         import hashlib
         result['checkpoint_sha256']=hashlib.sha256(Path(args.checkpoint).read_bytes()).hexdigest()
         result['configuration']=cfg
+        result['checkpoint_step']=checkpoint['total_steps']
+        result['evaluation_device']=str(trainer.device)
+        result['evaluation_source']=source_metadata()
         atomic_json(output/'comparison.json',result)
         for policy in ('trained','greedy'):
             trace=episode(trainer,args.seed,policy,trace=True)
