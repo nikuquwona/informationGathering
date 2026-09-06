@@ -34,9 +34,13 @@ def main():
     label = f'r{args.round:02d}'
     config = ROOT / f'configs/optimization/{label}.json'
     record = ROOT / f'docs/experiments/ten-rounds/{label}'
+    if record.exists() and any(record.iterdir()):
+        raise FileExistsError('Round records already exist; preserve them and use a new study namespace')
     record.mkdir(parents=True, exist_ok=True)
     output = ROOT / f'output/fixed-window/{label}'
-    output.mkdir(parents=True, exist_ok=True)
+    if output.exists():
+        raise FileExistsError('Training output already exists; no experiment evidence will be overwritten')
+    output.mkdir(parents=True, exist_ok=False)
     source = source_metadata()
     if source['dirty']:
         raise RuntimeError('Commit round configuration/code before running')

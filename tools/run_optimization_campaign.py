@@ -22,6 +22,8 @@ def main():
       (9,'environment','gp_length_scale',7.5,'缩短 GP 空间相关长度','原先 15 米相关长度可能平滑掉较窄的人群信号簇；减半检验感知分辨能力，使用同样训练和测试分布。'),
     ]
     for number,section,key,value,title,hypothesis in candidates:
+        if (ROOT/f'docs/experiments/ten-rounds/r{number:02d}/results.json').exists():
+            raise FileExistsError('This study round is already recorded; use a separate study for repetition')
         previous=[]
         for n in range(1,number):
             r=json.loads((ROOT/f'docs/experiments/ten-rounds/r{n:02d}/results.json').read_text())
