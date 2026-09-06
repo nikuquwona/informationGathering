@@ -1,0 +1,4 @@
+{
+  "environment": {"users": 12, "grid_size": 8, "gp_axis": 2, "gp_max_samples": 8, "horizon": 8},
+  "training": {"device": "mps", "total_steps": 32, "rollout_steps": 16, "epochs": 2, "minibatch_size": 24, "eval_every": 2, "eval_episodes": 2}
+}
